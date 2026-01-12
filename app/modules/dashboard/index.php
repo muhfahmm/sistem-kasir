@@ -1,7 +1,6 @@
 <?php
 include '../../config/koneksi.php';
-// Session start wajib ditaruh paling atas nanti saat sudah ada login system
-session_start();
+require_once '../../config/auth_check.php'; // Cek Sesi Login Logic
 
 include '../../template/header.php';
 include '../../template/sidebar.php';

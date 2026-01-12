@@ -65,7 +65,8 @@ Sistem membedakan akses antara **Admin** dan **Kasir**.
 *   **Scan Barcode via Kamera**: 
     - Menggunakan kamera HP/Webcam untuk scan barcode produk.
     - **Teknologi**: Menggunakan library JavaScript **`html5-qrcode`** yang berjalan di browser.
-    - **Alur**: JavaScript mengakses kamera -> Scan Barcode -> Mengirim kode ke PHP via AJAX -> PHP mencari produk di database -> Barang masuk keranjang.
+    - **Alur Transaksi**: Scan -> Masuk Keranjang.
+    - **Alur Input Produk Baru**: Jika admin men-scan kode yang **belum terdaftar**, sistem otomatis membuka formulir tambah produk dengan kode terisi, lalu meminta input Kategori/Label dan Nama Produk.
 *   **Keranjang Belanja Sementara**: List barang yang akan dibayar.
 *   **Kalkulasi Otomatis**: Subtotal, Diskon (Opsional), Total, Bayar, Kembalian.
 *   **Cetak Struk**: Print langsung ke thermal printer atau popup print browser.
@@ -84,10 +85,15 @@ Agar aplikasi terasa premium dan tidak "kaku":
 ## 6. Daftar Todo (Tahapan Pengerjaan)
 1.  [x] Buat Database SQL.
 2.  [x] Buat Struktur Folder.
-3.  [ ] Buat File Koneksi Database (`config/koneksi.php`).
-4.  [ ] Buat Template Layout (Header/Sidebar/Footer) dengan desain Glassmorphism.
-5.  [ ] Buat Halaman Login.
-6.  [ ] Buat Modul Dashboard.
-7.  [ ] Buat Modul Produk (CRUD).
-8.  [ ] Buat Modul Transaksi (Inti Aplikasi).
-9.  [ ] Buat Modul Laporan.
+3.  [x] Buat File Koneksi Database (`config/koneksi.php`).
+4.  [x] Buat Template Layout (Header/Sidebar/Footer) dengan desain Glassmorphism.
+5.  [x] Buat Halaman Login & Register (Auth).
+6.  [x] Buat Modul Dashboard.
+7.  [x] Buat Modul Produk (CRUD + **Smart Scan Input**).
+8.  [x] Buat Modul Kategori.
+9.  [ ] Buat Modul Transaksi (Inti Aplikasi - *Next Priority*).
+    - [ ] Logic Keranjang (Add to Cart).
+    - [ ] Integrasi Scanner di Kasir.
+    - [ ] Proses Pembayaran & Struk.
+10. [ ] Buat Modul Laporan.
+11. [x] Fitur Dark/Light Mode.

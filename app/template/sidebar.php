@@ -55,7 +55,12 @@ function is_active($page_name) {
         <?php endif; ?>
         
         <li style="margin-top: 30px;">
-            <a href="<?= $base_url ?>/modules/auth/logout.php" style="color: var(--danger-color); border: 1px solid rgba(255,77,77,0.2);">
+            <a href="#" id="themeToggle" onclick="toggleTheme(event)">
+                <i class="fas fa-sun"></i> Mode Terang
+            </a>
+        </li>
+        <li>
+            <a href="<?= $base_url ?>/modules/auth/api/logout.php" style="color: var(--danger-color); border: 1px solid rgba(255,77,77,0.2);">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </li>
