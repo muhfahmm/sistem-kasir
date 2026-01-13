@@ -27,8 +27,7 @@ include '../../template/sidebar.php';
                 <th>Kode</th>
                 <th>Nama Produk</th>
                 <th>Kategori</th>
-                <th>Harga Beli</th>
-                <th>Harga Jual</th>
+                <th>Harga</th>
                 <th>Stok</th>
                 <th>Aksi</th>
             </tr>
@@ -46,8 +45,7 @@ include '../../template/sidebar.php';
                 <td><span style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;"><?= $d['kode_produk'] ?></span></td>
                 <td><?= $d['nama_produk'] ?></td>
                 <td><?= $d['nama_kategori'] ?></td>
-                <td>Rp <?= number_format($d['harga_beli']) ?></td>
-                <td>Rp <?= number_format($d['harga_jual']) ?></td>
+                <td>Rp <?= number_format($d['harga']) ?></td>
                 <td>
                     <?php if($d['stok'] <= 5): ?>
                         <span style="color: var(--danger-color);"><?= $d['stok'] ?></span>

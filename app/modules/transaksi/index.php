@@ -1,9 +1,10 @@
-include '../../config/koneksi.php';
+<?php
+require_once '../../config/koneksi.php';
 require_once '../../config/auth_check.php'; // Cek Sesi Login Logic
+require_once '../../config/role_helper.php'; // Helper functions untuk role
 
-// Cek Role
-$role = $_SESSION['role']; // 'admin' atau 'kasir'
-$is_admin = ($role == 'admin');
+// Cek apakah user adalah admin (role aktif = admin)
+$is_admin = isActiveAdmin();
 
 include '../../template/header.php';
 
@@ -69,7 +70,7 @@ if ($is_admin) {
                         <i class="fas fa-box fa-2x" style="color: var(--text-secondary);"></i>
                     </div>
                     <h5 style="margin-bottom: 5px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= $p['nama_produk'] ?></h5>
-                    <p style="color: var(--accent-color); font-weight: bold;">Rp <?= number_format($p['harga_jual']) ?></p>
+                    <p style="color: var(--accent-color); font-weight: bold;">Rp <?= number_format($p['harga']) ?></p>
                 </div>
                 <?php endwhile; ?>
             </div>
@@ -110,28 +111,197 @@ if ($is_admin) {
     </div>
 </div>
 
+<!-- Modal Scan Error -->
+<div id="scanErrorModal" class="modal-overlay" style="display: none;" onclick="closeScanErrorModal()">
+    <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 400px;">
+        <div class="modal-icon error">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 class="modal-title">Scan Gagal</h3>
+        <p class="modal-message" id="scanErrorMessage">Objek yang di-scan bukan barcode/QR code yang valid.</p>
+        <div style="margin-top: 20px;">
+            <button class="modal-button" onclick="closeScanErrorModal()">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scanner Lock Indicator -->
+<div id="scannerLockIndicator" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; background: rgba(0,0,0,0.9); padding: 30px; border-radius: 16px; border: 2px solid var(--accent-color); text-align: center;">
+    <div class="spinner" style="width: 60px; height: 60px; border: 4px solid rgba(0,212,255,0.3); border-top: 4px solid var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+    <p style="color: var(--accent-color); font-weight: bold; margin: 0;">Memproses Scan...</p>
+    <small style="color: var(--text-secondary);">Validasi barcode/QR code</small>
+</div>
+
+<style>
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, rgba(30,30,30,0.95), rgba(20,20,20,0.95));
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    animation: slideUp 0.3s ease;
+}
+
+.modal-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+}
+
+.modal-icon.error {
+    background: rgba(255,69,58,0.2);
+    color: #ff453a;
+}
+
+.modal-title {
+    margin: 0 0 10px;
+    color: #fff;
+}
+
+.modal-message {
+    color: var(--text-secondary);
+    margin: 0 0 20px;
+}
+
+.modal-button {
+    background: var(--accent-color);
+    color: #000;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.modal-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(0,212,255,0.4);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+</style>
+
 <!-- Modal / Script Scanner & Cart Logic -->
 <script>
 // --- VARIABEL GLOBAL ---
 let html5QrcodeScanner = null;
-const beepSound = new Audio('../../assets/audio/beep.mp3'); // Pastikan file audio ada atau gunakan URL online dummy dulu
-// Fallback dummy audio (opsional jika file belum ada)
-// beepSound.src = "https://www.soundjay.com/buttons/sounds/button-3.mp3"; 
+let isScanning = false; // Flag untuk prevent double scan
+const beepSound = new Audio('../../assets/audio/beep.mp3');
+const errorSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGWi77eeeTRAMUKfj8LZjHAY4ktfyzHksBSR3x/DdkEAKFF606+uoVRQKRp/g8r5sIQUrgs7y2Yk2CBlou+3nnk0QDFCn4/C2YxwGOJLX8sx5LAUkd8fw3ZBAC'); // Beep error
+
+// Check if Html5Qrcode library is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Page loaded, checking Html5Qrcode library...');
+    if (typeof Html5Qrcode === 'undefined') {
+        console.error('Html5Qrcode library NOT loaded!');
+        alert('Error: Scanner library tidak ter-load!\n\nSolusi:\n1. Refresh halaman (F5)\n2. Clear browser cache\n3. Cek koneksi internet');
+    } else {
+        console.log('Html5Qrcode library loaded successfully!');
+    }
+});
+
+// --- MODAL FUNCTIONS ---
+function showScanErrorModal(message) {
+    document.getElementById('scanErrorMessage').textContent = message;
+    document.getElementById('scanErrorModal').style.display = 'flex';
+    errorSound.play().catch(e => console.log('Error sound failed', e));
+}
+
+function closeScanErrorModal() {
+    document.getElementById('scanErrorModal').style.display = 'none';
+    // Resume scanner setelah modal ditutup
+    if (html5QrcodeScanner && isScanning) {
+        setTimeout(() => {
+            html5QrcodeScanner.resume();
+            isScanning = false;
+        }, 500);
+    }
+}
+
+function showScannerLock() {
+    document.getElementById('scannerLockIndicator').style.display = 'block';
+}
+
+function hideScannerLock() {
+    document.getElementById('scannerLockIndicator').style.display = 'none';
+}
 
 // --- SCANNER LOGIC ---
 function openCamera() {
+    console.log('openCamera() called');
     const scannerContainer = document.getElementById('camera-preview');
-    const readerDiv = document.getElementById('reader');
     
-    // Toggle Tampilan
-    if (scannerContainer.style.display === 'none') {
+    if (!scannerContainer) {
+        console.error('Element camera-preview not found!');
+        alert('Error: Camera container not found!');
+        return;
+    }
+    
+    console.log('Current display:', scannerContainer.style.display);
+    
+    if (scannerContainer.style.display === 'none' || scannerContainer.style.display === '') {
+        console.log('Opening camera...');
         scannerContainer.style.display = 'block';
         
-        // Init Library
+        if (html5QrcodeScanner) {
+            console.log('Scanner already initialized, stopping first...');
+            html5QrcodeScanner.stop().then(() => {
+                initScanner();
+            }).catch(err => {
+                console.log('Stop error (ignored):', err);
+                initScanner();
+            });
+        } else {
+            initScanner();
+        }
+    } else {
+        console.log('Closing camera...');
+        stopCamera();
+    }
+}
+
+function initScanner() {
+    console.log('Initializing scanner...');
+    
+    try {
         html5QrcodeScanner = new Html5Qrcode("reader");
+        console.log('Html5Qrcode instance created');
         
-        // Config: FPS lebih tinggi agar 'langsung terbaca'
-        // qrbox lebih lebar agar cocok untuk barcode panjang
         const config = { 
             fps: 20, 
             qrbox: { width: 300, height: 150 },
@@ -141,16 +311,25 @@ function openCamera() {
             }
         };
         
-        // Start Camera (Environment = Kamera Belakang)
-        html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess)
-        .catch(err => {
-            console.error("Gagal membuka kamera:", err);
-            alert("Gagal membuka kamera. Pastikan izin akses diberikan dan menggunakan HTTPS/Localhost.");
-        });
+        console.log('Starting camera with config:', config);
         
-    } else {
-        // Jika sudah terbuka, tutup
-        stopCamera();
+        html5QrcodeScanner.start(
+            { facingMode: "environment" }, 
+            config, 
+            onScanSuccess, 
+            onScanFailure
+        )
+        .then(() => {
+            console.log('Camera started successfully!');
+        })
+        .catch(err => {
+            console.error("Failed to start camera:", err);
+            alert("Gagal membuka kamera: " + err.message + "\n\nPastikan:\n1. Browser Chrome/Edge/Firefox\n2. Izin kamera di-allow\n3. Akses dari localhost");
+            scannerContainer.style.display = 'none';
+        });
+    } catch (error) {
+        console.error('Error in initScanner:', error);
+        alert('Error initializing scanner: ' + error.message);
     }
 }
 
@@ -160,24 +339,41 @@ function stopCamera() {
             document.getElementById('camera-preview').style.display = 'none';
         }).catch(err => {
             console.log("Stop failed", err);
-            // Hide anyway
-             document.getElementById('camera-preview').style.display = 'none';
+            document.getElementById('camera-preview').style.display = 'none';
         });
     }
 }
 
 function onScanSuccess(decodedText, decodedResult) {
-    // 1. Mainkan Suara
+    if (isScanning) return; // Prevent double scan
+    
+    isScanning = true;
+    
+    // Pause scanner dan show lock indicator
+    html5QrcodeScanner.pause();
+    showScannerLock();
+    
+    // Validasi: Cek apakah hasil scan valid (minimal 3 karakter)
+    if (!decodedText || decodedText.trim().length < 3) {
+        setTimeout(() => {
+            hideScannerLock();
+            showScanErrorModal('Kode yang di-scan terlalu pendek atau tidak valid.');
+            isScanning = false;
+        }, 800);
+        return;
+    }
+    
+    // Play beep sound
     beepSound.play().catch(e => console.log("Audio play failed", e));
     
-    // 2. Masukkan ke Keranjang via AJAX
+    // Proses scan ke server
     addToCartByCode(decodedText);
-    
-    // Opsional: Pause sebentar agar tidak double scan cepat (tapi tetap responsif)
-    html5QrcodeScanner.pause();
-    setTimeout(() => {
-        html5QrcodeScanner.resume();
-    }, 700);
+}
+
+function onScanFailure(error) {
+    // Callback ini dipanggil setiap frame yang gagal detect
+    // Kita tidak perlu handle di sini karena terlalu sering
+    // console.log("Scan failed:", error);
 }
 
 // --- CART LOGIC ---
@@ -201,20 +397,30 @@ function addToCartByCode(code) {
     fetch('api/api_cart.php?act=add_by_code&code=' + code)
         .then(response => response.json())
         .then(data => {
+            hideScannerLock();
+            
             if(data.status === 'success') {
                 updateCartUI();
                 beepSound.play();
+                // Resume scanner setelah sukses
+                setTimeout(() => {
+                    if (html5QrcodeScanner) {
+                        html5QrcodeScanner.resume();
+                    }
+                    isScanning = false;
+                }, 1000);
             } else if (data.status === 'not_found') {
-                // Logic Cerdas: Jika produk tidak ada, tawarkan tambah produk
-                // Gunakan confirm atau langsung redirect (tergantung preferensi, confirm lebih aman agar tidak kaget)
-                if(confirm("Produk belum terdaftar. Tambah data produk baru sekarang?")) {
-                     window.location.href = "../produk/form.php?code=" + encodeURIComponent(code);
-                }
+                showScanErrorModal('Produk dengan kode "' + code + '" tidak ditemukan di database.');
+                // Modal akan handle resume scanner saat ditutup
             } else {
-                alert("Gagal: " + data.message);
+                showScanErrorModal('Gagal menambahkan produk: ' + data.message);
             }
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+            console.error(err);
+            hideScannerLock();
+            showScanErrorModal('Terjadi kesalahan koneksi ke server.');
+        });
 }
 
 // Update Tampilan Keranjang

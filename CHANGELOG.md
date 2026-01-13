@@ -4,6 +4,88 @@ Dokumen ini mencatat semua perubahan dan update yang telah dilakukan pada projec
 
 ---
 
+## 🎯 Session 3 - 13 Januari 2026 (Sore)
+
+### ✅ Database Schema v3.0 - Simplified Harga
+- [x] **Hapus kolom `harga_beli` dan `harga_jual`** → Diganti dengan `harga` saja
+- [x] **`database_v3_simplified_harga.sql`** - Full schema v3.0 untuk fresh install
+- [x] **`database_migration_v3_simplified_harga.sql`** - Migration script dari v2.0 ke v3.0
+- [x] **Alasan**: Sistem kasir retail umumnya hanya perlu harga jual, lebih sederhana
+
+### ✅ Update File PHP untuk v3.0
+- [x] **`produk/index.php`** - Hapus kolom Harga Beli & Harga Jual, tampilkan Harga saja
+- [x] **`produk/form.php`** - Hapus field harga_beli & harga_jual, ganti dengan harga
+- [x] **`produk/api/proses.php`** - Update INSERT & UPDATE query untuk kolom harga
+- [x] **`transaksi/index.php`** - Update display harga produk di grid
+- [x] **`transaksi/api/api_cart.php`** - Update harga_jual → harga di cart logic
+
+### ✅ Fitur Scanner Auto-Lock
+- [x] **Auto-Lock saat scan** - Scanner pause otomatis saat detect objek
+- [x] **Lock Indicator** - Spinner loading saat processing scan
+- [x] **Validasi Barcode/QR** - Cek panjang kode minimal 3 karakter
+- [x] **Modal Error Modern** - Glassmorphism design untuk error notification
+- [x] **Sound Effects** - Beep success & beep error
+- [x] **Prevent Double Scan** - Flag isScanning mencegah scan ganda
+- [x] **Auto-Resume** - Scanner resume otomatis setelah proses selesai
+
+### ✅ Dokumentasi
+- [x] **`UPDATE_V3_SIMPLIFIED_HARGA.md`** - Panduan lengkap update v3.0
+- [x] **`SCANNER_AUTO_LOCK.md`** - Dokumentasi fitur auto-lock scanner
+
+---
+
+## 🎯 Session 2 - 13 Januari 2026 (Pagi)
+
+### ✅ Fitur Multiple Roles
+- [x] **Update Database Schema**: Kolom `role` diubah dari `ENUM('admin', 'kasir')` menjadi `VARCHAR(50)`
+- [x] **Form Registrasi dengan Checkbox Role**:
+  - User bisa memilih Admin, Kasir, atau keduanya
+  - Validasi JavaScript minimal 1 role harus dipilih
+  - Hover effect pada checkbox untuk UX lebih baik
+- [x] **Proses Registrasi Multiple Roles**:
+  - Menerima array roles dari checkbox
+  - Validasi server-side hanya menerima 'admin' dan 'kasir'
+  - Menyimpan sebagai comma-separated values (e.g., "admin,kasir")
+- [x] **Proses Login dengan Role Validation**:
+  - Parse multiple roles dari database
+  - Validasi role yang dipilih terhadap roles yang dimiliki user
+  - Session menyimpan `role` (aktif) dan `all_roles` (semua role user)
+- [x] **Routing Berdasarkan Role Aktif**:
+  - User dengan "admin,kasir" bisa login sebagai salah satunya
+  - Redirect sesuai role yang dipilih saat login
+- [x] **Migration Script**: `database_migration_multiple_roles.sql`
+- [x] **Dokumentasi**: `FITUR_MULTIPLE_ROLES.md` dengan panduan lengkap
+
+### ✅ Struktur File SQL (Versioning)
+- [x] **`database.sql`** - Original schema (v1.0) tetap dipertahankan, tidak diubah
+- [x] **`database_v2_multiple_roles.sql`** - Schema lengkap v2.0 dengan multiple roles support
+- [x] **`database_migration_multiple_roles.sql`** - Migration script dari v1.0 ke v2.0
+- [x] **`DATABASE_FILES_GUIDE.md`** - Panduan lengkap kapan menggunakan file SQL mana
+- [x] **Prinsip**: Never modify original files, always create new versioned files
+
+### ✅ Role Helper Functions
+- [x] **`config/role_helper.php`** - Helper functions untuk role management
+- [x] **10 Helper Functions**:
+  - `hasRole()` - Cek apakah user punya role tertentu
+  - `isAdmin()` - Cek apakah user punya role admin
+  - `isKasir()` - Cek apakah user punya role kasir
+  - `hasBothRoles()` - Cek apakah user punya kedua role
+  - `getActiveRole()` - Get role aktif yang dipilih saat login
+  - `getAllRoles()` - Get semua role sebagai array
+  - `isActiveAdmin()` - Cek apakah sedang login sebagai admin
+  - `isActiveKasir()` - Cek apakah sedang login sebagai kasir
+  - `getRoleDisplayName()` - Get nama display role
+  - `getAllRolesDisplay()` - Get semua role dalam format readable
+- [x] **`ROLE_HELPER_DOCS.md`** - Dokumentasi lengkap dengan contoh penggunaan
+
+### ✅ Bug Fixes
+- Fixed: Missing `<?php` tag di `app/index.php` yang menyebabkan routing tidak berfungsi
+- Fixed: Missing `<?php` tag di `modules/transaksi/index.php` yang menyebabkan error undefined variable
+- Fixed: Variable `$conn` undefined karena urutan include yang salah
+- Fixed: Variable `$is_admin` undefined di line 51 dan 64
+
+---
+
 ## 🎯 Session 1 - 12 Januari 2026
 
 ### ✅ Database & Struktur Awal
@@ -152,4 +234,4 @@ Dokumen ini mencatat semua perubahan dan update yang telah dilakukan pada projec
 
 ---
 
-**Last Updated**: 12 Januari 2026, 22:21 WIB
+**Last Updated**: 13 Januari 2026, 11:40 WIB

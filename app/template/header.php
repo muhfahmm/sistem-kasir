@@ -23,6 +23,9 @@
     }
     ?>
     <link rel="stylesheet" href="<?= $base_url ?>/assets/css/style.css">
+    
+    <!-- html5-qrcode Library untuk Barcode/QR Scanner -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
     <div class="wrapper">

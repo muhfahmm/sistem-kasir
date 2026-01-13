@@ -29,7 +29,7 @@ if ($action == 'add') {
             $_SESSION['cart'][$id] = [
                 'id' => $produk['id_produk'],
                 'nama' => $produk['nama_produk'],
-                'harga' => $produk['harga_jual'],
+                'harga' => $produk['harga'],
                 'qty' => $qty
             ];
         }
@@ -57,7 +57,7 @@ elseif ($action == 'add_by_code') {
                 $_SESSION['cart'][$id] = [
                     'id' => $produk['id_produk'],
                     'nama' => $produk['nama_produk'],
-                    'harga' => $produk['harga_jual'],
+                    'harga' => $produk['harga'],
                     'qty' => 1
                 ];
             }

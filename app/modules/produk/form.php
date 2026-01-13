@@ -6,7 +6,7 @@ $id = isset($_GET['id']) ? $_GET['id'] : '';
 $is_edit = $id != '';
 
 $data = [
-    'kode_produk' => '', 'nama_produk' => '', 'id_kategori' => '', 'harga_beli' => '', 'harga_jual' => '', 'stok' => ''
+    'kode_produk' => '', 'nama_produk' => '', 'id_kategori' => '', 'harga' => '', 'stok' => ''
 ];
 
 // Cek jika ada parameter code dari hasil scan
@@ -87,15 +87,9 @@ include '../../template/sidebar.php';
         }
         </script>
 
-        <div class="d-flex gap-2" style="margin-bottom: 15px;">
-            <div class="w-100">
-                <label style="display:block; margin-bottom:5px;">Harga Beli</label>
-                <input type="number" name="harga_beli" class="form-control" value="<?= $data['harga_beli'] ?>" required>
-            </div>
-            <div class="w-100">
-                <label style="display:block; margin-bottom:5px;">Harga Jual</label>
-                <input type="number" name="harga_jual" class="form-control" value="<?= $data['harga_jual'] ?>" required>
-            </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom:5px;">Harga</label>
+            <input type="number" name="harga" class="form-control" value="<?= $data['harga'] ?>" required placeholder="Harga jual produk">
         </div>
 
         <div style="margin-bottom: 30px;">

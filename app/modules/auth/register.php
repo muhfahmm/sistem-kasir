@@ -34,6 +34,22 @@ require_once '../../config/koneksi.php';
                 <label style="display: block; margin-bottom: 8px;">Password</label>
                 <input type="password" name="password" class="form-control" required placeholder="Password kuat">
             </div>
+            
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label style="display: block; margin-bottom: 12px; font-weight: 500;">Pilih Role (minimal 1)</label>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: all 0.3s;">
+                        <input type="checkbox" name="roles[]" value="admin" style="margin-right: 10px; cursor: pointer; width: 18px; height: 18px;">
+                        <span>Admin - Akses penuh ke semua fitur</span>
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: all 0.3s;">
+                        <input type="checkbox" name="roles[]" value="kasir" style="margin-right: 10px; cursor: pointer; width: 18px; height: 18px;">
+                        <span>Kasir - Akses transaksi penjualan</span>
+                    </label>
+                </div>
+                <small style="color: var(--text-secondary); display: block; margin-top: 8px;">Anda bisa memilih kedua role sekaligus</small>
+            </div>
+            
             <button type="submit" class="btn btn-primary w-100" style="justify-content: center;">REGISTER</button>
         </form>
         <div style="margin-top: 20px;">
@@ -63,6 +79,26 @@ require_once '../../config/koneksi.php';
             // Remove query params from URL
             window.history.replaceState({}, document.title, window.location.pathname);
         }
+
+        // Validasi form - minimal 1 role harus dipilih
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const checkboxes = document.querySelectorAll('input[name="roles[]"]:checked');
+            if (checkboxes.length === 0) {
+                e.preventDefault();
+                alert('Silakan pilih minimal 1 role (Admin atau Kasir)');
+                return false;
+            }
+        });
+
+        // Hover effect untuk checkbox labels
+        document.querySelectorAll('label[style*="cursor: pointer"]').forEach(label => {
+            label.addEventListener('mouseenter', function() {
+                this.style.background = 'rgba(255,255,255,0.1)';
+            });
+            label.addEventListener('mouseleave', function() {
+                this.style.background = 'rgba(255,255,255,0.05)';
+            });
+        });
     </script>
     <?php endif; ?>
 

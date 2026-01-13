@@ -1,3 +1,4 @@
+<?php
 // Entry point sederhana
 // Jika belum login ke login.php, jika sudah redirect sesuai role.
 

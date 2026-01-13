@@ -14,7 +14,11 @@ if (mysqli_num_rows($result) === 1) {
     if (password_verify($password, $row['password'])) {
         // Cek apakah Role yang dipilih sesuai dengan di database
         $selected_role = $_POST['role'];
-        if ($selected_role != $row['role']) {
+        
+        // Handle multiple roles (bisa berupa "admin", "kasir", atau "admin,kasir")
+        $user_roles = explode(',', $row['role']); // Convert "admin,kasir" menjadi array
+        
+        if (!in_array($selected_role, $user_roles)) {
             header("Location: ../login.php?error=Role tidak sesuai dengan akun Anda");
             exit;
         }
@@ -22,12 +26,13 @@ if (mysqli_num_rows($result) === 1) {
         // Set Session
         $_SESSION['user_id'] = $row['id_user'];
         $_SESSION['username'] = $row['username'];
-        $_SESSION['role'] = $row['role'];
+        $_SESSION['role'] = $selected_role; // Simpan role yang dipilih saat login
+        $_SESSION['all_roles'] = $row['role']; // Simpan semua role user untuk referensi
         $_SESSION['nama_lengkap'] = $row['nama_lengkap'];
 
-        // Redirect sesuai Role
-        if ($row['role'] == 'kasir') {
-            header("Location: ../../modules/transaksi/index.php"); // Kasir langsung ke POS
+        // Redirect sesuai Role yang dipilih
+        if ($selected_role == 'kasir') {
+            header("Location: ../../transaksi/index.php"); // Kasir langsung ke POS
         } else {
             header("Location: ../../dashboard/index.php"); // Admin ke Dashboard
         }
