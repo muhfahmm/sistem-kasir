@@ -22,33 +22,33 @@ function is_active($page_name) {
 
     <ul class="menu">
         <li>
-            <a href="<?= $base_url ?>/modules/dashboard/index.php" class="<?= is_active('dashboard') ?>">
+            <a href="<?= $base_url ?>/modules/dashboard/dashboard.php" class="<?= is_active('dashboard') ?>">
                 <i class="fas fa-home"></i> Dashboard
             </a>
         </li>
         <li>
-            <a href="<?= $base_url ?>/modules/transaksi/index.php" class="<?= is_active('transaksi') ?>">
+            <a href="<?= $base_url ?>/modules/transaksi/transaksi.php" class="<?= is_active('transaksi') ?>">
                 <i class="fas fa-cash-register"></i> Transaksi Kasir
             </a>
         </li>
         <li>
-            <a href="<?= $base_url ?>/modules/produk/index.php" class="<?= is_active('produk') ?>">
+            <a href="<?= $base_url ?>/modules/produk/produk.php" class="<?= is_active('produk') ?>">
                 <i class="fas fa-box-open"></i> Data Produk
             </a>
         </li>
         <li>
-            <a href="<?= $base_url ?>/modules/kategori/index.php" class="<?= is_active('kategori') ?>">
+            <a href="<?= $base_url ?>/modules/kategori/kategori.php" class="<?= is_active('kategori') ?>">
                 <i class="fas fa-tags"></i> Kategori
             </a>
         </li>
         <li>
-            <a href="<?= $base_url ?>/modules/laporan/index.php" class="<?= is_active('laporan') ?>">
+            <a href="<?= $base_url ?>/modules/laporan/laporan.php" class="<?= is_active('laporan') ?>">
                 <i class="fas fa-chart-pie"></i> Laporan
             </a>
         </li>
         <?php if(true): // Nanti diganti cek role == admin ?>
         <li>
-            <a href="<?= $base_url ?>/modules/user/index.php" class="<?= is_active('user') ?>">
+            <a href="<?= $base_url ?>/modules/user/user.php" class="<?= is_active('user') ?>">
                 <i class="fas fa-users-cog"></i> Manajemen User
             </a>
         </li>

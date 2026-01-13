@@ -32,9 +32,9 @@ if (mysqli_num_rows($result) === 1) {
 
         // Redirect sesuai Role yang dipilih
         if ($selected_role == 'kasir') {
-            header("Location: ../../transaksi/index.php"); // Kasir langsung ke POS
+            header("Location: ../../transaksi/transaksi.php"); // Kasir langsung ke POS
         } else {
-            header("Location: ../../dashboard/index.php"); // Admin ke Dashboard
+            header("Location: ../../dashboard/dashboard.php"); // Admin ke Dashboard
         }
         exit;
     }

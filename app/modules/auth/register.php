@@ -1,7 +1,7 @@
 <?php
 session_start();
 if(isset($_SESSION['user_id'])) {
-    header("Location: ../dashboard/index.php");
+    header("Location: ../dashboard/dashboard.php");
     exit;
 }
 require_once '../../config/koneksi.php';

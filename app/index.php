@@ -5,9 +5,9 @@
 session_start();
 if (isset($_SESSION['role'])) {
     if ($_SESSION['role'] == 'kasir') {
-        header("Location: modules/transaksi/index.php");
+        header("Location: modules/transaksi/transaksi.php");
     } else {
-        header("Location: modules/dashboard/index.php");
+        header("Location: modules/dashboard/dashboard.php");
     }
 } else {
     // Jika belum login, redirect ke login

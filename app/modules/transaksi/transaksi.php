@@ -42,21 +42,21 @@ if ($is_admin) {
             </div>
             
             <!-- Area Kamera -->
-            <div id="camera-preview" style="display: <?= $is_admin ? 'none' : 'block' ?>; margin-top: 15px; text-align: center;">
-                <div id="reader" style="width: 100%; max-width: 400px; margin: 0 auto; border-radius: 8px; overflow: hidden;"></div>
-                <small style="color: var(--text-secondary);">Arahkan kamera ke barcode</small>
+            <div id="camera-preview" style="display: none; margin-top: 15px; text-align: center;">
+                <div id="reader" style="width: 100%; max-width: 500px; margin: 0 auto; border-radius: 8px; overflow: hidden; background: #000;"></div>
+                <small style="color: var(--text-secondary); display: block; margin-top: 10px;">Arahkan kamera ke barcode/QR code</small>
             </div>
         </div>
 
-        <!-- Logic Auto Start Camera for Kasir -->
-        <?php if(!$is_admin): ?>
+        <!-- Logic Auto Start Camera for Kasir - DISABLED, gunakan manual saja -->
+        <?php /* if(!$is_admin): ?>
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 // Auto start camera for Kasir role after short delay
                 setTimeout(openCamera, 1000);
             });
         </script>
-        <?php endif; ?>
+        <?php endif; */ ?>
 
         <!-- Grid Produk -->
         <div style="flex: 1; overflow-y: auto; padding-right: 5px;">
@@ -244,10 +244,19 @@ function showScanErrorModal(message) {
 
 function closeScanErrorModal() {
     document.getElementById('scanErrorModal').style.display = 'none';
+    
+    // Restore camera opacity
+    const readerDiv = document.getElementById('reader');
+    if (readerDiv) {
+        readerDiv.style.opacity = '1';
+        readerDiv.style.pointerEvents = 'auto';
+    }
+    
     // Resume scanner setelah modal ditutup
     if (html5QrcodeScanner && isScanning) {
         setTimeout(() => {
             html5QrcodeScanner.resume();
+            console.log('🔓 Scanner resumed after modal close');
             isScanning = false;
         }, 500);
     }
@@ -297,6 +306,7 @@ function openCamera() {
 
 function initScanner() {
     console.log('Initializing scanner...');
+    const scannerContainer = document.getElementById('camera-preview');
     
     try {
         html5QrcodeScanner = new Html5Qrcode("reader");
@@ -325,7 +335,9 @@ function initScanner() {
         .catch(err => {
             console.error("Failed to start camera:", err);
             alert("Gagal membuka kamera: " + err.message + "\n\nPastikan:\n1. Browser Chrome/Edge/Firefox\n2. Izin kamera di-allow\n3. Akses dari localhost");
-            scannerContainer.style.display = 'none';
+            if (scannerContainer) {
+                scannerContainer.style.display = 'none';
+            }
         });
     } catch (error) {
         console.error('Error in initScanner:', error);
@@ -345,23 +357,50 @@ function stopCamera() {
 }
 
 function onScanSuccess(decodedText, decodedResult) {
-    if (isScanning) return; // Prevent double scan
+    console.log('🎯 SCAN DETECTED:', decodedText);
+    
+    if (isScanning) {
+        console.log('⚠️ Already scanning, ignored');
+        return; // Prevent double scan
+    }
     
     isScanning = true;
+    console.log('🔒 SCANNER LOCKED');
     
-    // Pause scanner dan show lock indicator
-    html5QrcodeScanner.pause();
+    // HARD PAUSE - Stop scanner immediately
+    try {
+        html5QrcodeScanner.pause(true); // Force pause
+        console.log('✅ Scanner paused');
+    } catch (e) {
+        console.log('⚠️ Pause error:', e);
+    }
+    
+    // Show lock indicator
     showScannerLock();
+    
+    // Add visual freeze overlay on camera
+    const readerDiv = document.getElementById('reader');
+    if (readerDiv) {
+        readerDiv.style.opacity = '0.5';
+        readerDiv.style.pointerEvents = 'none';
+    }
     
     // Validasi: Cek apakah hasil scan valid (minimal 3 karakter)
     if (!decodedText || decodedText.trim().length < 3) {
+        console.log('❌ Code too short:', decodedText);
         setTimeout(() => {
             hideScannerLock();
+            if (readerDiv) {
+                readerDiv.style.opacity = '1';
+                readerDiv.style.pointerEvents = 'auto';
+            }
             showScanErrorModal('Kode yang di-scan terlalu pendek atau tidak valid.');
             isScanning = false;
         }, 800);
         return;
     }
+    
+    console.log('✅ Code valid, processing...');
     
     // Play beep sound
     beepSound.play().catch(e => console.log("Audio play failed", e));
@@ -394,31 +433,52 @@ function addToCart(id_produk) {
 
 // Tambah via Barcode
 function addToCartByCode(code) {
+    console.log('📡 Sending to server:', code);
+    const readerDiv = document.getElementById('reader');
+    
     fetch('api/api_cart.php?act=add_by_code&code=' + code)
         .then(response => response.json())
         .then(data => {
+            console.log('📥 Server response:', data);
             hideScannerLock();
             
+            // Restore camera opacity
+            if (readerDiv) {
+                readerDiv.style.opacity = '1';
+                readerDiv.style.pointerEvents = 'auto';
+            }
+            
             if(data.status === 'success') {
+                console.log('✅ Product added to cart');
                 updateCartUI();
                 beepSound.play();
                 // Resume scanner setelah sukses
                 setTimeout(() => {
                     if (html5QrcodeScanner) {
                         html5QrcodeScanner.resume();
+                        console.log('🔓 Scanner resumed');
                     }
                     isScanning = false;
                 }, 1000);
             } else if (data.status === 'not_found') {
+                console.log('❌ Product not found');
                 showScanErrorModal('Produk dengan kode "' + code + '" tidak ditemukan di database.');
                 // Modal akan handle resume scanner saat ditutup
             } else {
+                console.log('❌ Error:', data.message);
                 showScanErrorModal('Gagal menambahkan produk: ' + data.message);
             }
         })
         .catch(err => {
-            console.error(err);
+            console.error('❌ Network error:', err);
             hideScannerLock();
+            
+            // Restore camera opacity
+            if (readerDiv) {
+                readerDiv.style.opacity = '1';
+                readerDiv.style.pointerEvents = 'auto';
+            }
+            
             showScanErrorModal('Terjadi kesalahan koneksi ke server.');
         });
 }
