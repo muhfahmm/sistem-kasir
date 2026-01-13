@@ -21,12 +21,6 @@ require_once '../../config/koneksi.php';
         <h2 style="margin-bottom: 20px; color: var(--accent-color);">Daftar Akun</h2>
         <p style="color: var(--text-secondary); margin-bottom: 30px;">Buat akun baru untuk masuk.</p>
 
-        <?php if(isset($_GET['error'])): ?>
-            <div style="background: rgba(255, 77, 77, 0.2); color: #ff4d4d; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
-                <?= htmlspecialchars($_GET['error']) ?>
-            </div>
-        <?php endif; ?>
-
         <form action="api/proses_register.php" method="POST">
             <div style="margin-bottom: 15px; text-align: left;">
                 <label style="display: block; margin-bottom: 8px;">Nama Lengkap</label>
@@ -46,6 +40,31 @@ require_once '../../config/koneksi.php';
             <a href="login.php" style="color: var(--text-secondary); text-decoration: none;">Sudah punya akun? Login</a>
         </div>
     </div>
+
+    <!-- Modal Error/Success -->
+    <?php if(isset($_GET['error']) || isset($_GET['success'])): ?>
+    <div class="modal-overlay" id="modalNotif" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <?php if(isset($_GET['error'])): ?>
+                <div class="modal-icon error"><i class="fas fa-times-circle"></i></div>
+                <h3 class="modal-title">Registrasi Gagal</h3>
+                <p class="modal-message"><?= htmlspecialchars($_GET['error']) ?></p>
+            <?php else: ?>
+                <div class="modal-icon success"><i class="fas fa-check-circle"></i></div>
+                <h3 class="modal-title">Registrasi Berhasil!</h3>
+                <p class="modal-message"><?= htmlspecialchars($_GET['success']) ?></p>
+            <?php endif; ?>
+            <button class="modal-button" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+    <script>
+        function closeModal() {
+            document.getElementById('modalNotif').style.display = 'none';
+            // Remove query params from URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    </script>
+    <?php endif; ?>
 
 </body>
 </html>

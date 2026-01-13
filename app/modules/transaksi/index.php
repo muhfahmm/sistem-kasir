@@ -1,8 +1,30 @@
-<?php
 include '../../config/koneksi.php';
 require_once '../../config/auth_check.php'; // Cek Sesi Login Logic
+
+// Cek Role
+$role = $_SESSION['role']; // 'admin' atau 'kasir'
+$is_admin = ($role == 'admin');
+
 include '../../template/header.php';
-include '../../template/sidebar.php';
+
+// Jika Admin, tampilkan Sidebar. Jika Kasir, Full Screen Mode.
+if ($is_admin) {
+    include '../../template/sidebar.php';
+} else {
+    // Style override khusus Kasir Mode agar full width tanpa margin sidebar
+    echo '<style> .main-content { margin-left: 0; padding: 20px; } </style>';
+    // Header minimalis untuk kasir (Logout & Nama)
+    echo '<div class="glass-header d-flex justify-between align-center" style="padding: 15px 20px; margin-bottom: 20px; border-radius: 12px;">
+            <div class="d-flex align-center gap-2">
+                <i class="fas fa-bolt" style="color: var(--accent-color); font-size: 1.5rem;"></i>
+                <h3 style="margin:0;">KASIR MODE</h3>
+            </div>
+            <div class="d-flex align-center gap-2">
+                <span>Hi, '. $_SESSION['nama_lengkap'] .'</span>
+                <a href="../../modules/auth/api/logout.php" class="btn btn-danger btn-sm"><i class="fas fa-power-off"></i></a>
+            </div>
+          </div>';
+}
 ?>
 
 <div class="d-flex" style="height: calc(100vh - 40px); gap: 20px;">
@@ -10,18 +32,30 @@ include '../../template/sidebar.php';
     <!-- Bagian Kiri: List Produk -->
     <div style="flex: 2; display: flex; flex-direction: column;">
         
-        <!-- Search & Filter -->
+        <!-- Search & Filter Area -->
         <div class="glass-panel" style="margin-bottom: 20px; padding: 15px;">
             <div class="d-flex gap-2">
                 <input type="text" id="searchProduct" class="form-control" placeholder="Cari Kode / Nama Produk (F2)..." style="flex: 1;" autofocus>
+                <!-- Tombol Scan tetep ada, tapi nanti kita bisa auto-open untuk kasir -->
                 <button class="btn btn-primary" onclick="openCamera()"><i class="fas fa-camera"></i> Scan</button>
             </div>
+            
             <!-- Area Kamera -->
-            <div id="camera-preview" style="display:none; margin-top: 15px; text-align: center;">
+            <div id="camera-preview" style="display: <?= $is_admin ? 'none' : 'block' ?>; margin-top: 15px; text-align: center;">
                 <div id="reader" style="width: 100%; max-width: 400px; margin: 0 auto; border-radius: 8px; overflow: hidden;"></div>
                 <small style="color: var(--text-secondary);">Arahkan kamera ke barcode</small>
             </div>
         </div>
+
+        <!-- Logic Auto Start Camera for Kasir -->
+        <?php if(!$is_admin): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Auto start camera for Kasir role after short delay
+                setTimeout(openCamera, 1000);
+            });
+        </script>
+        <?php endif; ?>
 
         <!-- Grid Produk -->
         <div style="flex: 1; overflow-y: auto; padding-right: 5px;">

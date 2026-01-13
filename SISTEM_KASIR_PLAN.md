@@ -87,13 +87,36 @@ Agar aplikasi terasa premium dan tidak "kaku":
 2.  [x] Buat Struktur Folder.
 3.  [x] Buat File Koneksi Database (`config/koneksi.php`).
 4.  [x] Buat Template Layout (Header/Sidebar/Footer) dengan desain Glassmorphism.
-5.  [x] Buat Halaman Login & Register (Auth).
+5.  [x] Buat Halaman Login & Register (Auth) dengan role selection.
 6.  [x] Buat Modul Dashboard.
 7.  [x] Buat Modul Produk (CRUD + **Smart Scan Input**).
-8.  [x] Buat Modul Kategori.
-9.  [ ] Buat Modul Transaksi (Inti Aplikasi - *Next Priority*).
-    - [ ] Logic Keranjang (Add to Cart).
-    - [ ] Integrasi Scanner di Kasir.
-    - [ ] Proses Pembayaran & Struk.
-10. [ ] Buat Modul Laporan.
+8.  [x] Buat Modul Kategori (CRUD + **Quick Add via AJAX**).
+9.  [x] Buat Modul Transaksi - **75% Complete**:
+    - [x] Logic Keranjang (Add to Cart via AJAX).
+    - [x] Integrasi Scanner di Kasir (html5-qrcode).
+    - [x] Smart Product Detection (Auto redirect jika produk baru).
+    - [x] Dual Mode UI (Admin vs Kasir).
+    - [ ] Proses Pembayaran & Cetak Struk - *Next Priority*.
+10. [ ] Buat Modul Laporan (Real data dari database).
 11. [x] Fitur Dark/Light Mode.
+12. [x] Modal Modern untuk Notifikasi.
+13. [x] Pemisahan API ke folder `api/` per modul.
+
+## 7. Fitur Tambahan yang Sudah Diimplementasi
+- [x] **Smart Scan**: Scan barcode produk baru langsung buka form input.
+- [x] **Quick Add Kategori**: Tambah kategori tanpa pindah halaman.
+- [x] **Dual Mode Interface**: Tampilan berbeda untuk Admin dan Kasir.
+- [x] **Auto-start Camera**: Kamera otomatis nyala untuk role Kasir.
+- [x] **Modal Glassmorphism**: Notifikasi error/success yang modern.
+- [x] **Session Protection**: Semua halaman dilindungi auth_check.
+- [x] **Clean Architecture**: Logic terpisah di folder api/.
+
+## 8. Teknologi & Library
+- **Backend**: PHP Native (7.4+)
+- **Database**: MySQL/MariaDB
+- **Frontend**: HTML5, CSS3 (Vanilla), JavaScript (Vanilla)
+- **Barcode Scanner**: html5-qrcode (via CDN)
+- **Icons**: Font Awesome 6.4.0
+- **Fonts**: Outfit (Google Fonts)
+- **Server**: XAMPP/Apache
+
