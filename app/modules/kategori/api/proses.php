@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $id = $_POST['id_kategori'];
         mysqli_query($conn, "DELETE FROM kategori WHERE id_kategori='$id'");
     }
-    header("Location: ../index.php"); // Kembali ke index kategori
+    header("Location: ../kategori.php"); // Kembali ke halaman kategori
     exit;
 }
 ?>

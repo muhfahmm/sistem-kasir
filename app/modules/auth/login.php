@@ -13,7 +13,39 @@ require_once '../../config/koneksi.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistem Kasir</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../assets/css/style.css">
+    <!-- Cache Busting CSS -->
+    <link rel="stylesheet" href="../../assets/css/style.css?v=<?= time() ?>">
+    
+    <!-- FORCE LIGHT MODE TEXT BLACK -->
+    <style>
+        html[data-theme="light"] body,
+        html[data-theme="light"] input, 
+        html[data-theme="light"] select, 
+        html[data-theme="light"] textarea,
+        html[data-theme="light"] .form-control {
+            color: #000000 !important; 
+            caret-color: #000000 !important;
+        }
+        
+        html[data-theme="light"] ::placeholder {
+            color: #555555 !important;
+            opacity: 0.8 !important;
+        }
+        
+        /* Pastikan background putih juga */
+        html[data-theme="light"] .form-control {
+            background-color: #ffffff !important;
+            border: 1px solid #ccc !important;
+        }
+    </style>
+    
+    <!-- Theme Init -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
 </head>
 <body style="display: flex; align-items: center; justify-content: center; height: 100vh;">
     

@@ -55,6 +55,21 @@ Dokumen ini mencatat semua perubahan dan update yang telah dilakukan pada projec
 - [x] **Update Path**: Semua link dan redirect sudah diperbaiki otomatis
 - [x] **Dokumentasi**: Update struktur folder di README.md
 
+### ✅ Bug Fix (Path Redirect)
+- [x] **Fix Kategori**: Redirect add/delete kategori ke `kategori.php` (sebelumnya error 404 ke index.php)
+- [x] **Fix Produk**: Redirect add/update/delete produk ke `produk.php`
+- [x] **Fix Link Form**: Update semua link di `produk.php` mengarah ke `produk_form.php`
+
+### 🚀 Fitur Baru & UX Improvements
+- [x] **POS Layout V2 (Kasir Mode)**:
+  - Revamp total `transaksi.php` menjadi layout 2 kolom.
+  - **Scanner Center**: Area kamera lebih besar dan di tengah kolom kiri.
+  - **Keranjang Fixed**: Sidebar keranjang di kanan (full height) dengan layout struk yang rapi.
+  - **Header Navigasi**: Navigasi khusus Kasir terpisah di atas.
+- [x] **Smart Scanner (Produk)**: Implementasi Auto-Lock & Auto-Redirect di halaman Produk (sama canggihnya dengan Transaksi).
+- [x] **Inline Editing (Kategori)**: Edit nama kategori langsung di tabel (klik Edit -> Form muncul di baris yang sama) tanpa refresh.
+- [x] **Tampilan Keranjang Refined**: Item keranjang sekarang lebih rapi dengan tombol hapus minimalis.
+
 ---
 
 ## 🎯 Session 2 - 13 Januari 2026 (Pagi)

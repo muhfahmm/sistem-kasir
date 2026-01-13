@@ -258,15 +258,16 @@ select.form-control {
 
 /* Dark Mode Select Options (Default) */
 select.form-control option {
-    background-color: #1e1e1e !important;
-    color: #ffffff !important;
+    background-color: #1e1e1e;
+    color: #ffffff;
 }
 
 select.form-control {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    color: white !important;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: white;
 }
 
+/* Light Mode Focus is handled by overrides below */
 input.form-control:focus {
     border-color: var(--accent-color);
     background: rgba(255, 255, 255, 0.1);
@@ -388,4 +389,25 @@ input.form-control:focus {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* LIGHT MODE FIXES (Override Previous !important) */
+html[data-theme="light"] select.form-control,
+html[data-theme="light"] input.form-control,
+html[data-theme="light"] textarea.form-control {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ced4da !important;
+    -webkit-text-fill-color: #000000 !important;
+    /* Force Chrome/Safari Text Color */
+}
+
+html[data-theme="light"] select.form-control option {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+html[data-theme="light"] ::placeholder {
+    color: #6c757d !important;
+    opacity: 1 !important;
 }

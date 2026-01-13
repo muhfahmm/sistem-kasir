@@ -26,5 +26,5 @@ if (isset($_POST['simpan'])) {
     mysqli_query($conn, "DELETE FROM produk WHERE id_produk='$id'");
 }
 
-header("Location: ../index.php");
+header("Location: ../produk.php");
 ?>

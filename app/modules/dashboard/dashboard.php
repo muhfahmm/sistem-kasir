@@ -78,24 +78,22 @@ include '../../template/sidebar.php';
                 </tr>
             </thead>
             <tbody>
+                <?php
+                $q_trx = mysqli_query($conn, "SELECT * FROM transaksi ORDER BY tanggal_transaksi DESC LIMIT 5");
+                if(mysqli_num_rows($q_trx) > 0) {
+                    while($row = mysqli_fetch_assoc($q_trx)):
+                ?>
                 <tr>
-                    <td>#INV-001</td>
-                    <td>10:42</td>
-                    <td>Rp 45.000</td>
+                    <td><?= $row['no_faktur'] ?></td>
+                    <td><?= date('H:i', strtotime($row['tanggal_transaksi'])) ?></td>
+                    <td>Rp <?= number_format($row['total_harga']) ?></td>
                     <td><span style="color: var(--success-color);">Lunas</span></td>
                 </tr>
-                <tr>
-                    <td>#INV-002</td>
-                    <td>10:45</td>
-                    <td>Rp 120.000</td>
-                    <td><span style="color: var(--success-color);">Lunas</span></td>
-                </tr>
-                <tr>
-                    <td>#INV-003</td>
-                    <td>11:00</td>
-                    <td>Rp 32.500</td>
-                    <td><span style="color: var(--success-color);">Lunas</span></td>
-                </tr>
+                <?php endwhile; 
+                } else {
+                    echo '<tr><td colspan="4" style="text-align: center;">Belum ada data</td></tr>';
+                }
+                ?>
             </tbody>
         </table>
     </div>
@@ -104,26 +102,41 @@ include '../../template/sidebar.php';
     <div class="glass-panel" style="flex: 1;">
         <h3 style="margin-bottom: 20px;">Produk Terlaris</h3>
         
-        <div class="d-flex align-center justify-between" style="padding: 10px 0; border-bottom: 1px solid var(--border-glass);">
-            <div class="d-flex align-center gap-2">
-                <div style="width: 40px; height: 40px; background: #333; border-radius: 8px;"></div>
-                <div>
-                    <h4 style="font-size: 14px;">Es Kopi Susu</h4>
-                    <small style="color: var(--text-secondary);">150 Terjual</small>
+        <div id="top-products-list">
+            <?php
+            $q_top = mysqli_query($conn, "
+                SELECT p.nama_produk, p.gambar, SUM(dt.jumlah) as terjual 
+                FROM detail_transaksi dt 
+                JOIN produk p ON dt.id_produk = p.id_produk 
+                GROUP BY dt.id_produk 
+                ORDER BY terjual DESC 
+                LIMIT 5
+            ");
+            
+            if(mysqli_num_rows($q_top) > 0):
+                $rank = 1;
+                while($item = mysqli_fetch_assoc($q_top)):
+                    $rankColor = ($rank == 1) ? 'var(--success-color)' : (($rank == 2) ? 'var(--accent-color)' : 'var(--warning-color)');
+            ?>
+            <div class="d-flex align-center justify-between" style="padding: 10px 0; border-bottom: 1px solid var(--border-glass);">
+                <div class="d-flex align-center gap-2">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <?php if(!empty($item['gambar']) && file_exists('../../assets/img/produk/'.$item['gambar'])): ?>
+                            <img src="../../assets/img/produk/<?= $item['gambar'] ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                        <?php else: ?>
+                            <i class="fas fa-box" style="color: var(--text-secondary);"></i>
+                        <?php endif; ?>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 14px; margin: 0;"><?= $item['nama_produk'] ?></h4>
+                        <small style="color: var(--text-secondary);"><?= $item['terjual'] ?> Terjual</small>
+                    </div>
                 </div>
+                <span style="color: <?= $rankColor ?>; font-weight: bold;">#<?= $rank++ ?></span>
             </div>
-            <span style="color: var(--success-color);">#1</span>
-        </div>
-
-        <div class="d-flex align-center justify-between" style="padding: 10px 0; border-bottom: 1px solid var(--border-glass);">
-            <div class="d-flex align-center gap-2">
-                <div style="width: 40px; height: 40px; background: #333; border-radius: 8px;"></div>
-                <div>
-                    <h4 style="font-size: 14px;">Roti Bakar</h4>
-                    <small style="color: var(--text-secondary);">120 Terjual</small>
-                </div>
-            </div>
-            <span style="color: var(--accent-color);">#2</span>
+            <?php endwhile; else: ?>
+                <p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Belum ada penjualan</p>
+            <?php endif; ?>
         </div>
 
     </div>

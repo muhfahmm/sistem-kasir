@@ -14,20 +14,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Load saved theme
+    // Load saved theme (Backup logic, though header script handles it mostly)
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
-        document.body.setAttribute('data-theme', savedTheme);
+        document.documentElement.setAttribute('data-theme', savedTheme);
         updateToggleIcon(savedTheme);
     }
 });
 
 function toggleTheme(e) {
     if (e) e.preventDefault();
-    const currentTheme = document.body.getAttribute('data-theme');
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
-    document.body.setAttribute('data-theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     updateToggleIcon(newTheme);
 }
@@ -35,7 +35,7 @@ function toggleTheme(e) {
 function updateToggleIcon(theme) {
     const btn = document.getElementById('themeToggle');
     if (btn) {
-        const icon = btn.querySelector('i');
+        // const icon = btn.querySelector('i'); // unused variable
         if (theme === 'light') {
             btn.innerHTML = '<i class="fas fa-moon"></i> Mode Gelap';
         } else {

@@ -26,11 +26,8 @@ function is_active($page_name) {
                 <i class="fas fa-home"></i> Dashboard
             </a>
         </li>
-        <li>
-            <a href="<?= $base_url ?>/modules/transaksi/transaksi.php" class="<?= is_active('transaksi') ?>">
-                <i class="fas fa-cash-register"></i> Transaksi Kasir
-            </a>
-        </li>
+
+
         <li>
             <a href="<?= $base_url ?>/modules/produk/produk.php" class="<?= is_active('produk') ?>">
                 <i class="fas fa-box-open"></i> Data Produk

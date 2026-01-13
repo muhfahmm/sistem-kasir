@@ -98,7 +98,7 @@ include '../../template/sidebar.php';
         </div>
 
         <button type="submit" name="<?= $is_edit ? 'update' : 'simpan' ?>" class="btn btn-primary w-100" style="justify-content:center;">Simpan Data</button>
-        <a href="index.php" class="btn w-100" style="margin-top: 10px; background: rgba(255,255,255,0.1); color: #fff; justify-content:center;">Batal</a>
+        <a href="produk.php" class="btn w-100" style="margin-top: 10px; background: rgba(255,255,255,0.1); color: #fff; justify-content:center;">Batal</a>
     </form>
 </div>
 
