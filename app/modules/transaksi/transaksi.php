@@ -398,12 +398,21 @@ function stopCamera() {
         document.getElementById('camera-preview').style.display = 'none';
     }
 }
+// --- LOCK UI FUNCTIONS ---
+function showScannerLock() {
+    document.getElementById('scannerLockIndicator').style.display = 'block';
+}
+
+function hideScannerLock() {
+    document.getElementById('scannerLockIndicator').style.display = 'none';
+}
 
 function onScanSuccess(decodedText, decodedResult) {
+    console.log("Scan Success:", decodedText); // Debugging
     if (isScanning) return;
     isScanning = true;
     
-    beepSound.play().catch(()=>{});
+    beepSound.play().catch(e => console.log('Audio error:', e));
     try { html5QrcodeScanner.pause(true); } catch(e){}
     
     const readerDiv = document.getElementById('reader');
@@ -411,22 +420,28 @@ function onScanSuccess(decodedText, decodedResult) {
     
     showScannerLock(); // Spinner
     
-    if (!decodedText || decodedText.trim().length < 3) {
-        setTimeout(() => {
-            hideScannerLock();
-            if(readerDiv) { readerDiv.style.opacity='1'; readerDiv.style.pointerEvents='auto'; }
-            
-            // Ganti direct call dengan custom logic agar bisa pake modal
-            document.getElementById('scanErrorMessage').textContent = 'Kode tidak valid.';
-            document.getElementById('scanErrorModal').style.display = 'flex';
-            errorSound.play().catch(()=>{});
-            
-            // Note: isScanning di-reset saat modal scan error ditutup (lihat hidePosModal)
-        }, 800);
+    // Validasi panjang minimum
+    if (!decodedText || decodedText.trim().length === 0) {
+        console.warn("Empty barcode detected");
+        handleScanError('Kode kosong/tidak valid');
         return;
     }
     
     addToCartByCode(decodedText);
+}
+
+function handleScanError(msg) {
+    setTimeout(() => {
+        hideScannerLock();
+        const readerDiv = document.getElementById('reader');
+        if(readerDiv) { readerDiv.style.opacity='1'; readerDiv.style.pointerEvents='auto'; }
+        
+        document.getElementById('scanErrorMessage').textContent = msg;
+        document.getElementById('scanErrorModal').style.display = 'flex';
+        errorSound.play().catch(()=>{});
+        
+        // Reset isScanning di hidePosModal
+    }, 800);
 }
 
 function onScanFailure(error) {}
@@ -537,7 +552,8 @@ function updateQty(id, change) {
 }
 
 function addToCartByCode(code) {
-    fetch('api/api_cart.php?act=add_by_code&code=' + code)
+    // Encode code to handle special characters safely
+    fetch('api/api_cart.php?act=add_by_code&code=' + encodeURIComponent(code))
         .then(res => res.json())
         .then(data => {
             hideScannerLock();

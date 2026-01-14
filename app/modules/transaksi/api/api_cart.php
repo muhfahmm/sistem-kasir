@@ -43,7 +43,9 @@ if ($action == 'add') {
 // 2. ADD ITEM BY BARCODE (Scanner)
 // --------------------------------------------------------------------------
 elseif ($action == 'add_by_code') {
-    $code = mysqli_real_escape_string($conn, $_GET['code']);
+    // Trim whitespace (penting untuk scanner yang kirim enter/spasi)
+    $raw_code = trim($_GET['code']);
+    $code = mysqli_real_escape_string($conn, $raw_code);
     
     $query = mysqli_query($conn, "SELECT * FROM produk WHERE kode_produk = '$code'");
     $produk = mysqli_fetch_assoc($query);
