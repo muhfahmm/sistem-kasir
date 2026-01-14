@@ -1,8 +1,8 @@
 -- =====================================================
 -- DATABASE SCHEMA - SISTEM KASIR
--- Version: 3.0 (Latest)
--- Update: 13 Januari 2026
--- Features: Multiple Roles + Simplified Harga
+-- Version: 5.0 (Latest)
+-- Update: 14 Januari 2026
+-- Features: Multiple Roles + Simplified Harga + Full Cascading Delete (Product & Category)
 -- =====================================================
 
 CREATE DATABASE IF NOT EXISTS db_kasir;
@@ -42,7 +42,7 @@ CREATE TABLE produk (
     gambar VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_kategori) REFERENCES kategori(id_kategori) ON DELETE SET NULL
+    FOREIGN KEY (id_kategori) REFERENCES kategori(id_kategori) ON DELETE CASCADE
 );
 
 -- =====================================================
@@ -83,7 +83,7 @@ CREATE TABLE detail_transaksi (
     harga_satuan DECIMAL(10, 2) NOT NULL,
     subtotal DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (id_transaksi) REFERENCES transaksi(id_transaksi) ON DELETE CASCADE,
-    FOREIGN KEY (id_produk) REFERENCES produk(id_produk)
+    FOREIGN KEY (id_produk) REFERENCES produk(id_produk) ON DELETE CASCADE
 );
 
 -- =====================================================

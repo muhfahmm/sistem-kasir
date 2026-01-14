@@ -168,4 +168,47 @@ function stopCamera() {
 }
 </script>
 
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+// Check URL parameters for alerts
+const urlParams = new URLSearchParams(window.location.search);
+const alertType = urlParams.get('alert');
+
+if (alertType) {
+    if (alertType === 'hapus_berhasil') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: 'Data produk berhasil dihapus',
+            background: 'var(--glass-bg)',
+            color: 'var(--text-primary)',
+            confirmButtonColor: 'var(--accent-color)'
+        });
+    } else if (alertType === 'gagal_hapus_terpakai') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal Menghapus',
+            text: 'Produk tidak dapat dihapus karena sudah memiliki riwayat transaksi. Hapus data transaksi terkait terlebih dahulu jika ingin menghapus produk ini.',
+            background: 'var(--glass-bg)',
+            color: 'var(--text-primary)',
+            confirmButtonColor: 'var(--danger-color)'
+        });
+    } else if (alertType === 'gagal_hapus') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Terjadi Kesalahan',
+            text: 'Gagal menghapus data produk.',
+            background: 'var(--glass-bg)',
+            color: 'var(--text-primary)',
+            confirmButtonColor: 'var(--danger-color)'
+        });
+    }
+    
+    // Clean URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+</script>
+
 <?php include '../../template/footer.php'; ?>

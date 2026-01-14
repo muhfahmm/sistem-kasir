@@ -5,6 +5,9 @@ $user = "root";
 $pass = "";
 $db   = "db_kasir";
 
+// Enable Error Reporting for Mysqli
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 // Membuat koneksi
 $conn = mysqli_connect($host, $user, $pass, $db);
 

@@ -24,6 +24,7 @@ if (isset($_POST['simpan'])) {
 } elseif (isset($_GET['act']) && $_GET['act'] == 'delete') {
     $id = $_GET['id'];
     mysqli_query($conn, "DELETE FROM produk WHERE id_produk='$id'");
+    header("Location: ../produk.php?alert=hapus_berhasil");
 }
 
 header("Location: ../produk.php");
