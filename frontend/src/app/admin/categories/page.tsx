@@ -35,7 +35,7 @@ export default function AdminCategoriesPage() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/categories')
+      const res = await fetch('http://127.0.0.1:8000/api/categories')
       const data = await res.json()
       setCategories(data)
       setLoading(false)
@@ -48,8 +48,8 @@ export default function AdminCategoriesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const url = editingCategory 
-      ? `http://localhost:8000/api/categories/${editingCategory.id}`
-      : 'http://localhost:8000/api/categories'
+      ? `http://127.0.0.1:8000/api/categories/${editingCategory.id}`
+      : 'http://127.0.0.1:8000/api/categories'
     const method = editingCategory ? 'PUT' : 'POST'
 
     try {
@@ -73,7 +73,7 @@ export default function AdminCategoriesPage() {
     if (!confirm('Apakah Anda yakin ingin menghapus kategori ini?')) return
     
     try {
-      const res = await fetch(`http://localhost:8000/api/categories/${id}`, {
+      const res = await fetch(`http://127.0.0.1:8000/api/categories/${id}`, {
         method: 'DELETE',
       })
       if (res.ok) {

@@ -16,11 +16,14 @@ import {
   CreditCard,
   TrendingUp,
   Package,
-  Users
+  Users,
+  Camera
 } from "lucide-react"
 import { useCartStore } from "@/store/useCartStore"
 import { ThemeToggle } from "@/components/theme-toggle"
 import clsx from "clsx"
+import BarcodeScanner from "@/components/BarcodeScanner"
+import ReceiptModal from "@/components/ReceiptModal"
 
 const POS_DATA = [
   { id: 1, name: "Espresso", price: 25000, category: "Minuman" },
@@ -37,9 +40,51 @@ export default function PosPage() {
   const { items, addItem, removeItem, clearCart, total } = useCartStore()
   const [products, setProducts] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(true)
+  const [isScannerOpen, setIsScannerOpen] = React.useState(false)
+  const [isReceiptOpen, setIsReceiptOpen] = React.useState(false)
+  const [lastOrderId, setLastOrderId] = React.useState('')
+
+  const handleCheckout = async () => {
+    if (items.length === 0) return
+    const orderId = `INV-${Date.now()}`
+    
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: orderId,
+          subtotal: total,
+          tax: total * 0.10,
+          total: total * 1.10,
+          items: items.map(item => ({
+            id: item.id,
+            quantity: item.quantity,
+            price: item.price
+          }))
+        })
+      })
+
+      if (res.ok) {
+        setLastOrderId(orderId)
+        setIsReceiptOpen(true)
+      } else {
+        const error = await res.json()
+        alert("Gagal menyimpan transaksi: " + (error.message || "Error tidak diketahui"))
+      }
+    } catch (err) {
+      console.error("Checkout error:", err)
+      alert("Terjadi kesalahan jaringan saat proses pembayaran")
+    }
+  }
+
+  const handleCloseReceipt = () => {
+    setIsReceiptOpen(false)
+    clearCart()
+  }
 
   React.useEffect(() => {
-    fetch('http://localhost:8000/api/products')
+    fetch('http://127.0.0.1:8000/api/products')
       .then(res => res.json())
       .then(data => {
         setProducts(data)
@@ -50,7 +95,7 @@ export default function PosPage() {
         setLoading(false)
       })
 
-    fetch('http://localhost:8000/api/categories')
+    fetch('http://127.0.0.1:8000/api/categories')
       .then(res => res.json())
       .then(data => {
         const sortedCategories = [{ id: 0, name: 'Semua' }, ...data];
@@ -64,6 +109,16 @@ export default function PosPage() {
   const filteredProducts = products.filter(p => 
     selectedCategory === 0 || p.category_id === selectedCategory
   )
+
+  const handleBarcodeScan = (code: string) => {
+    const product = products.find(p => p.sku === code)
+    if (product) {
+      addItem(product)
+      // Visual feedback or sound could be added here
+    } else {
+      alert(`Produk dengan SKU ${code} tidak ditemukan.`)
+    }
+  }
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500 overflow-hidden font-sans">
@@ -126,13 +181,22 @@ export default function PosPage() {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder="Cari menu favorit..." 
-                className="pl-12 pr-6 py-3 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl w-80 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all outline-none text-slate-700 dark:text-slate-200"
-              />
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input 
+                  type="text" 
+                  placeholder="Cari menu favorit..." 
+                  className="pl-12 pr-6 py-3 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl w-80 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all outline-none text-slate-700 dark:text-slate-200"
+                />
+              </div>
+              <button 
+                onClick={() => setIsScannerOpen(true)}
+                className="p-4 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-500 rounded-2xl transition-all shadow-sm"
+                title="Scan Barcode/QR"
+              >
+                <Camera className="w-6 h-6" />
+              </button>
             </div>
           </div>
         </header>
@@ -190,7 +254,22 @@ export default function PosPage() {
                 </div>
                 
                 <div className="flex-1 flex flex-col justify-end">
-                  <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base md:text-md mb-0.5 line-clamp-1">{product.name}</h3>
+                  <div className="flex items-center justify-between gap-2 mb-0.5">
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base md:text-md line-clamp-1">
+                      {product.name}
+                    </h3>
+                    <div className={clsx(
+                      "shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-xl font-black text-[9px] uppercase tracking-tighter transition-all border shadow-sm",
+                      product.stock_quantity <= 0
+                        ? "bg-slate-100 text-slate-400 border-slate-200 line-through"
+                        : product.stock_quantity <= 5 
+                          ? "bg-rose-50 text-rose-600 border-rose-200 animate-pulse" 
+                          : "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800"
+                    )}>
+                      <Package className="w-3 h-3" />
+                      <span>{product.stock_quantity <= 0 ? 'HABIS' : `SISA ${product.stock_quantity}`}</span>
+                    </div>
+                  </div>
                   <p className="text-slate-400 dark:text-slate-500 text-xs font-medium mb-3">{product.category?.name || 'Item'}</p>
                   <div className="flex items-center justify-between mt-auto">
                     <span className="text-blue-600 dark:text-blue-400 font-black text-lg">Rp {Number(product.price).toLocaleString('id-ID')}</span>
@@ -261,23 +340,45 @@ export default function PosPage() {
               <span>Rp {total.toLocaleString('id-ID')}</span>
             </div>
             <div className="flex justify-between text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest text-xs">
-              <span>Pajak (11%)</span>
-              <span>Rp {(total * 0.11).toLocaleString('id-ID')}</span>
+              <span>Pajak (10%)</span>
+              <span>Rp {(total * 0.10).toLocaleString('id-ID')}</span>
             </div>
             <div className="flex justify-between items-center mt-2 group">
               <span className="text-xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter group-hover:text-blue-600 transition-colors duration-300">Total Harga</span>
               <span className="text-3xl font-black text-blue-600 dark:text-blue-400 underline decoration-blue-500/30 underline-offset-8">
-                Rp {(total * 1.11).toLocaleString('id-ID')}
+                Rp {(total * 1.10).toLocaleString('id-ID')}
               </span>
             </div>
           </div>
           
-          <button className="btn-primary w-full group">
+          <button 
+            onClick={handleCheckout}
+            className="btn-primary w-full group"
+            disabled={items.length === 0}
+          >
             <CreditCard className="w-6 h-6 group-hover:scale-110 transition-transform" />
             <span>Bayar Sekarang</span>
           </button>
         </div>
       </div>
+
+      {/* Barcode Scanner Overlay */}
+      {isScannerOpen && (
+        <BarcodeScanner 
+          onScan={handleBarcodeScan}
+          onClose={() => setIsScannerOpen(false)}
+        />
+      )}
+      {/* Receipt Modal */}
+      <ReceiptModal 
+        isOpen={isReceiptOpen}
+        onClose={handleCloseReceipt}
+        items={items}
+        subtotal={total}
+        tax={total * 0.10}
+        total={total * 1.10}
+        orderId={lastOrderId}
+      />
     </div>
   )
 }
