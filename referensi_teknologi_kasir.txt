@@ -1,0 +1,29 @@
+REFERENSI TAMBAHAN: TEKNOLOGI SISTEM KASIR (POS) MODERN
+
+1. Frontend (Antarmuka Pengguna)
+   - React.js atau Next.js: Populer untuk membangun aplikasi web yang responsif dan SEO-friendly.
+   - Vue.js: Alternatif yang lebih ringan dan mudah dipelajari.
+   - Tailwind CSS: Untuk desain antarmuka yang modern, bersih, dan kustomisasi cepat.
+   - Electron: Jika ingin mengubah aplikasi web menjadi aplikasi desktop (Windows/macOS/Linux).
+   - React Native atau Flutter: Jika sistem kasir akan digunakan pada perangkat tablet atau smartphone (Android/iOS).
+
+2. Backend (Logika Bisnis & API)
+   - Node.js (Express atau NestJS): Sangat efisien untuk menangani banyak koneksi secara bersamaan (real-time).
+   - Go (Golang): Sangat cepat dan cocok untuk sistem yang membutuhkan konkurensi tinggi.
+   - Python (FastAPI atau Django): Bagus jika Anda ingin mengintegrasikan fitur kecerdasan buatan (AI) nantinya.
+   - Laravel (PHP): Pilihan solid untuk pengembangan cepat dengan fitur keamanan bawaan yang lengkap.
+
+3. Database (Penyimpanan Data)
+   - PostgreSQL: Database relasional paling canggih untuk menyimpan data transaksi, inventaris, dan pelanggan dengan aman.
+   - Redis: Digunakan untuk caching agar aplikasi terasa sangat cepat, atau untuk menangani antrean transaksi saat ramai.
+   - MongoDB: Jika Anda membutuhkan fleksibilitas pada data produk yang memiliki banyak atribut berbeda-beda.
+
+4. Fitur Canggih (Integrasi & Teknologi Modern)
+   - Midtrans atau Xendit: Untuk integrasi pembayaran digital (QRIS, E-Wallet, Virtual Account).
+   - PWA (Progressive Web App): Agar aplikasi web bisa diakses secara offline jika koneksi internet terputus.
+   - Socket.io: Untuk sinkronisasi data real-time antara kasir, dapur (jika di restoran), dan dashboard pemilik.
+   - Cloud Hosting (AWS, Google Cloud, atau DigitalOcean): Untuk memastikan sistem selalu dapat diakses dan memiliki cadangan data otomatis.
+   - Docker: Untuk memudahkan proses pengembangan dan penyebaran aplikasi (deployment).
+
+5. Hardware Integration
+   - WebUSB / Web Bluetooth API: Untuk menghubungkan aplikasi web langsung ke printer termal atau barcode scanner tanpa perlu aplikasi tambahan.

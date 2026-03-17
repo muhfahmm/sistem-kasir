@@ -1,0 +1,1 @@
+"C:\Users\fahim\AppData\Local\Microsoft\WinGet\Packages\PHP.PHP.8.3_Microsoft.Winget.Source_8wekyb3d8bbwe\php.exe" "C:\fhm\PROJECT - ANTIGRAVITY\SISTEM KASIR\composer.phar" create-project laravel/laravel "C:\fhm\PROJECT - ANTIGRAVITY\SISTEM KASIR\backend_new" --prefer-dist --no-interaction -vvv
