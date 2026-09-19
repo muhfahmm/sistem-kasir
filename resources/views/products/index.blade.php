@@ -1,0 +1,197 @@
+@extends('layouts.app')
+
+@section('title', 'Manajemen Produk & Barcode')
+
+@section('content')
+<div class="space-y-6">
+    <!-- Header Page & Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900">Manajemen Produk & Stok</h2>
+            <p class="text-xs text-slate-500">Tambah produk baru secara manual atau scan dengan Barcode Reader.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="openModal()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2 text-sm">
+                <i class="fa-solid fa-plus"></i> Tambah Produk Baru
+            </button>
+        </div>
+    </div>
+
+    <!-- Search & Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <form method="GET" action="{{ route('products.index') }}" class="mb-5 flex items-center gap-3">
+            <div class="relative flex-1">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari berdasarkan nama produk atau kode barcode..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-emerald-500 focus:bg-white transition-all">
+            </div>
+            <button type="submit" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs transition-all">Cari</button>
+        </form>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+                <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                        <th class="py-3 px-4">Barcode / SKU</th>
+                        <th class="py-3 px-4">Nama Produk</th>
+                        <th class="py-3 px-4">Kategori & Satuan</th>
+                        <th class="py-3 px-4">Harga Jual</th>
+                        <th class="py-3 px-4">Stok Unit</th>
+                        <th class="py-3 px-4 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($products as $p)
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3.5 px-4 font-mono font-bold text-slate-800">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-lg text-emerald-700">
+                                <i class="fa-solid fa-barcode text-xs"></i> {{ $p->barcode }}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-4 font-bold text-slate-900 text-sm">{{ $p->nama_produk }}</td>
+                        <td class="py-3.5 px-4 text-slate-500">
+                            <span class="text-slate-700 font-semibold">{{ $p->category->nama_kategori }}</span> / {{ $p->unit->nama_satuan }}
+                        </td>
+                        <td class="py-3.5 px-4 font-extrabold text-emerald-600 text-sm">Rp {{ number_format($p->harga_jual, 0, ',', '.') }}</td>
+                        <td class="py-3.5 px-4">
+                            @if($p->stok <= $p->stok_minimal)
+                                <span class="px-2.5 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 font-bold">
+                                    {{ $p->stok }} {{ $p->unit->nama_satuan }} (Min: {{ $p->stok_minimal }})
+                                </span>
+                            @else
+                                <span class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold">
+                                    {{ $p->stok }} {{ $p->unit->nama_satuan }}
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4 text-center">
+                            <form action="{{ route('products.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus produk ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Hapus Produk">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-slate-400">Tidak ada produk ditemukan. Tambahkan produk pertama Anda!</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4">
+            {{ $products->links() }}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Form Tambah Produk (Tanpa HPP) -->
+<div id="productModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center hidden">
+    <div class="bg-white border border-slate-200 w-full max-w-xl rounded-2xl p-6 shadow-2xl space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-box-open text-emerald-600"></i> Tambah Produk Baru
+            </h3>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <form action="{{ route('products.store') }}" method="POST" class="space-y-4">
+            @csrf
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Kode Barcode / SKU</label>
+                <div class="flex gap-2">
+                    <input type="text" id="barcode_input" name="barcode" required placeholder="Arahkan scanner fisik atau ketik..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 font-mono text-sm focus:border-emerald-500 focus:bg-white focus:outline-none">
+                    <button type="button" onclick="startCameraScanner()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-camera"></i> Scan Cam
+                    </button>
+                </div>
+                <div id="reader" class="mt-3 hidden rounded-xl overflow-hidden border border-slate-200 max-w-sm mx-auto"></div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Nama Produk</label>
+                <input type="text" name="nama_produk" required placeholder="Contoh: Air Mineral Aqua 600ml" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:border-emerald-500 focus:bg-white focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Kategori</label>
+                    <select name="category_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-xs focus:border-emerald-500 focus:bg-white">
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Satuan</label>
+                    <select name="unit_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-xs focus:border-emerald-500 focus:bg-white">
+                        @foreach($units as $u)
+                            <option value="{{ $u->id }}">{{ $u->nama_satuan }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Harga Jual Kasir (Rp)</label>
+                <input type="number" name="harga_jual" required placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 font-bold text-sm focus:border-emerald-500 focus:bg-white focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Stok Awal</label>
+                    <input type="number" name="stok" required value="10" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-xs focus:border-emerald-500 focus:bg-white">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Stok Minimal (Alert)</label>
+                    <input type="number" name="stok_minimal" required value="5" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-xs focus:border-emerald-500 focus:bg-white">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">
+                <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs">Batal</button>
+                <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20">Simpan Produk</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    function openModal() {
+        document.getElementById('productModal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('barcode_input').focus(), 100);
+    }
+
+    function closeModal() {
+        document.getElementById('productModal').classList.add('hidden');
+        if (html5QrCode) {
+            html5QrCode.stop().catch(err => console.log(err));
+        }
+    }
+
+    let html5QrCode;
+    function startCameraScanner() {
+        const readerDiv = document.getElementById('reader');
+        readerDiv.classList.remove('hidden');
+
+        html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 250, height: 150 } },
+            (decodedText) => {
+                document.getElementById('barcode_input').value = decodedText;
+                html5QrCode.stop();
+                readerDiv.classList.add('hidden');
+            },
+            (errorMessage) => {}
+        ).catch(err => alert("Kamera tidak diizinkan atau tidak ditemukan!"));
+    }
+</script>
+@endpush
