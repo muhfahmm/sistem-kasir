@@ -218,8 +218,17 @@
     let cart = [];
     const barcodeInput = document.getElementById('barcode_scanner_input');
 
-    // Auto focus ke input scanner saat halaman dimuat & klik di mana saja
-    window.addEventListener('load', () => barcodeInput.focus());
+    // Auto focus ke input scanner saat halaman dimuat & periksa scan dari halaman lain
+    window.addEventListener('load', () => {
+        barcodeInput.focus();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoScanBarcode = urlParams.get('scan');
+        if (autoScanBarcode) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            fetchProductByBarcode(autoScanBarcode);
+        }
+    });
     document.addEventListener('click', (e) => {
         const modal = document.getElementById('quick_product_modal');
         const catModal = document.getElementById('posQuickCategoryModal');

@@ -26,7 +26,9 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-base text-slate-900 leading-none">KasirPOS</h1>
-                    <span class="text-[11px] text-slate-400 font-medium">Sistem Penjualan</span>
+                    <span class="text-[11px] text-emerald-600 font-bold block truncate max-w-[130px] mt-1" title="{{ Auth::user()->name ?? 'Administrator' }}">
+                        <i class="fa-solid fa-circle text-[7px] text-emerald-500 mr-1 inline-block align-middle"></i>{{ Auth::user()->name ?? 'Administrator' }}
+                    </span>
                 </div>
             </div>
 
@@ -120,6 +122,45 @@
 
     <!-- HTML5-QRCode Library for Web Cam Scanner -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <!-- Global Barcode Scanner Listener Script -->
+    <script>
+    (function() {
+        if (window.location.pathname.startsWith('/pos')) return;
+
+        let globalBarcodeBuffer = '';
+        let globalScanTimer;
+
+        document.addEventListener('keydown', function(e) {
+            const targetTag = e.target.tagName;
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(targetTag) || e.target.isContentEditable) {
+                return;
+            }
+
+            if (e.key === 'Enter') {
+                if (globalBarcodeBuffer.trim().length >= 3) {
+                    const barcode = globalBarcodeBuffer.trim();
+                    globalBarcodeBuffer = '';
+                    window.location.href = `/pos?scan=${encodeURIComponent(barcode)}`;
+                }
+                globalBarcodeBuffer = '';
+            } else if (e.key.length === 1) {
+                globalBarcodeBuffer += e.key;
+                clearTimeout(globalScanTimer);
+                globalScanTimer = setTimeout(() => {
+                    if (globalBarcodeBuffer.trim().length >= 6) {
+                        const barcode = globalBarcodeBuffer.trim();
+                        globalBarcodeBuffer = '';
+                        window.location.href = `/pos?scan=${encodeURIComponent(barcode)}`;
+                    } else {
+                        globalBarcodeBuffer = '';
+                    }
+                }, 200);
+            }
+        });
+    })();
+    </script>
+
     @stack('scripts')
 </body>
 </html>
