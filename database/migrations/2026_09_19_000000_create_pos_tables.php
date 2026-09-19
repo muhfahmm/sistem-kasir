@@ -44,6 +44,8 @@ return new class extends Migration
             $table->decimal('bayar', 15, 2)->default(0);
             $table->decimal('kembali', 15, 2)->default(0);
             $table->enum('metode_pembayaran', ['cash', 'qris', 'transfer'])->default('cash');
+            $table->enum('status_pembayaran', ['paid', 'pending', 'failed', 'expired'])->default('paid');
+            $table->string('snap_token')->nullable();
             $table->text('catatan')->nullable();
             $table->timestamps();
 

@@ -80,25 +80,23 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Metode Bayar</label>
-                        <select id="metode_pembayaran" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 font-medium focus:border-emerald-500 focus:bg-white">
+                        <select id="metode_pembayaran" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 font-bold focus:border-emerald-500 focus:bg-white transition-all">
                             <option value="cash">Tunai (Cash)</option>
-                            <option value="qris">QRIS</option>
-                            <option value="transfer">Transfer Bank</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Uang Diterima (Rp)</label>
-                        <input type="number" id="bayar_input" oninput="calculateChange()" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono font-bold focus:border-emerald-500 focus:bg-white">
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1" id="bayar_input_label">Uang Diterima (Rp)</label>
+                        <input type="number" id="bayar_input" oninput="calculateChange()" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-extrabold focus:border-emerald-500 focus:bg-white transition-all">
                     </div>
                 </div>
 
                 <div class="flex justify-between items-center px-3.5 py-2.5 bg-slate-50 rounded-xl border border-slate-200">
                     <span class="text-xs text-slate-500 font-medium">Kembalian:</span>
-                    <span id="kembalian_display" class="text-sm font-mono font-bold text-slate-800">Rp 0</span>
+                    <span id="kembalian_display" class="text-sm font-extrabold text-slate-800">Rp 0</span>
                 </div>
             </div>
 
-            <button onclick="processCheckout()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 text-sm transition-all flex items-center justify-center gap-2">
+            <button id="checkout_btn" onclick="processCheckout()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/20 text-sm transition-all flex items-center justify-center gap-2">
                 <i class="fa-solid fa-print"></i> Bayar & Cetak Struk
             </button>
         </div>
@@ -497,11 +495,11 @@
                     <td class="py-2 px-2 text-center">
                         <div class="flex items-center justify-center gap-1">
                             <button onclick="updateQty(${item.id}, -1)" class="w-5 h-5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded flex items-center justify-center text-xs font-bold">-</button>
-                            <span class="font-mono px-1">${item.qty}</span>
+                            <span class="font-bold px-1">${item.qty}</span>
                             <button onclick="updateQty(${item.id}, 1)" class="w-5 h-5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded flex items-center justify-center text-xs font-bold">+</button>
                         </div>
                     </td>
-                    <td class="py-2 px-2 text-right font-mono font-bold text-emerald-600">Rp ${subtotal.toLocaleString('id-ID')}</td>
+                    <td class="py-2 px-2 text-right font-extrabold text-emerald-600">Rp ${subtotal.toLocaleString('id-ID')}</td>
                     <td class="py-2 px-2 text-center">
                         <button onclick="removeItem(${item.id})" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-xmark"></i></button>
                     </td>
@@ -511,12 +509,13 @@
 
         tbody.innerHTML = html;
         document.getElementById('grand_total_display').innerText = 'Rp ' + total.toLocaleString('id-ID');
-        calculateChange();
     }
 
     function calculateChange() {
         const total = cart.reduce((sum, item) => sum + (item.harga_jual * item.qty), 0);
-        const bayar = parseFloat(document.getElementById('bayar_input').value) || 0;
+        const bayarInput = document.getElementById('bayar_input');
+
+        const bayar = parseFloat(bayarInput.value) || 0;
         const kembali = bayar - total;
         const display = document.getElementById('kembalian_display');
 
@@ -537,8 +536,14 @@
             return;
         }
 
-        const bayar = parseFloat(document.getElementById('bayar_input').value) || 0;
+        const method = document.getElementById('metode_pembayaran').value;
         const total = cart.reduce((sum, item) => sum + (item.harga_jual * item.qty), 0);
+        let bayar = parseFloat(document.getElementById('bayar_input').value) || 0;
+
+        if (method === 'qris' || method === 'transfer') {
+            bayar = total;
+            document.getElementById('bayar_input').value = total;
+        }
 
         if (bayar < total) {
             alert("Uang pembayaran belum cukup!");
@@ -569,7 +574,7 @@
                 document.getElementById('bayar_input').value = '';
                 location.reload();
             } else {
-                alert(data.message);
+                alert(data.message || "Gagal memproses transaksi!");
             }
         })
         .catch(err => alert("Terjadi kesalahan saat memproses checkout!"));

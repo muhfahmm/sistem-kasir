@@ -18,6 +18,8 @@ class Transaction extends Model
         'bayar',
         'kembali',
         'metode_pembayaran',
+        'status_pembayaran',
+        'snap_token',
         'catatan'
     ];
 

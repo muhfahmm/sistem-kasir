@@ -76,6 +76,8 @@ CREATE TABLE `tb_transactions` (
   `bayar` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
   `kembali` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
   `metode_pembayaran` ENUM('cash', 'qris', 'transfer') NOT NULL DEFAULT 'cash',
+  `status_pembayaran` ENUM('paid', 'pending', 'failed', 'expired') NOT NULL DEFAULT 'paid',
+  `snap_token` VARCHAR(255) NULL DEFAULT NULL,
   `catatan` TEXT NULL DEFAULT NULL,
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

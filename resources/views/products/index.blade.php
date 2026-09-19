@@ -64,13 +64,18 @@
                             @endif
                         </td>
                         <td class="py-3.5 px-4 text-center">
-                            <form action="{{ route('products.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus produk ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Hapus Produk">
-                                    <i class="fa-solid fa-trash-can"></i>
+                            <div class="flex items-center justify-center gap-1">
+                                <button type="button" onclick='openEditProductModal(@json($p))' class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Edit Produk">
+                                    <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
-                            </form>
+                                <form action="{{ route('products.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus produk ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Hapus Produk">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -191,6 +196,73 @@
         </form>
     </div>
 </div>
+<!-- Modal Form Edit Produk -->
+<div id="editProductModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center hidden">
+    <div class="bg-white border border-slate-200 w-full max-w-xl rounded-2xl p-6 shadow-2xl space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square text-emerald-600"></i> Edit Produk
+            </h3>
+            <button onclick="closeEditProductModal()" class="text-slate-400 hover:text-slate-700">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <form id="editProductForm" method="POST" class="space-y-4">
+            @csrf
+            @method('PUT')
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Kode Barcode / SKU</label>
+                <input type="text" id="edit_barcode" name="barcode" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 font-mono text-sm focus:border-emerald-500 focus:bg-white focus:outline-none">
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Nama Produk</label>
+                <input type="text" id="edit_nama_produk" name="nama_produk" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:border-emerald-500 focus:bg-white focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Kategori</label>
+                    <select id="edit_category_id" name="category_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-xs focus:border-emerald-500 focus:bg-white">
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Satuan</label>
+                    <select id="edit_unit_id" name="unit_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-xs focus:border-emerald-500 focus:bg-white">
+                        @foreach($units as $u)
+                            <option value="{{ $u->id }}">{{ $u->nama_satuan }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Harga Jual Kasir (Rp)</label>
+                <input type="number" id="edit_harga_jual" name="harga_jual" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 font-bold text-sm focus:border-emerald-500 focus:bg-white focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Stok Unit</label>
+                    <input type="number" id="edit_stok" name="stok" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-xs focus:border-emerald-500 focus:bg-white">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Stok Minimal (Alert)</label>
+                    <input type="number" id="edit_stok_minimal" name="stok_minimal" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-xs focus:border-emerald-500 focus:bg-white">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">
+                <button type="button" onclick="closeEditProductModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs">Batal</button>
+                <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -205,6 +277,23 @@
         if (html5QrCode) {
             html5QrCode.stop().catch(err => console.log(err));
         }
+    }
+
+    function openEditProductModal(product) {
+        document.getElementById('editProductForm').action = '/products/' + product.id;
+        document.getElementById('edit_barcode').value = product.barcode;
+        document.getElementById('edit_nama_produk').value = product.nama_produk;
+        document.getElementById('edit_category_id').value = product.category_id;
+        document.getElementById('edit_unit_id').value = product.unit_id;
+        document.getElementById('edit_harga_jual').value = product.harga_jual;
+        document.getElementById('edit_stok').value = product.stok;
+        document.getElementById('edit_stok_minimal').value = product.stok_minimal;
+
+        document.getElementById('editProductModal').classList.remove('hidden');
+    }
+
+    function closeEditProductModal() {
+        document.getElementById('editProductModal').classList.add('hidden');
     }
 
     function openQuickCategoryModal() {
@@ -246,6 +335,12 @@
                 option.text = data.data.nama_kategori;
                 option.selected = true;
                 catSelect.appendChild(option);
+
+                const editCatSelect = document.getElementById('edit_category_id');
+                const option2 = document.createElement('option');
+                option2.value = data.data.id;
+                option2.text = data.data.nama_kategori;
+                editCatSelect.appendChild(option2);
 
                 closeQuickCategoryModal();
                 alert('Kategori ' + data.data.nama_kategori + ' berhasil disimpan ke database!');

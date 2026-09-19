@@ -76,7 +76,7 @@ class PosController extends Controller
     {
         $request->validate([
             'items' => 'required|array|min:1',
-            'items.*.id' => 'required|exists:products,id',
+            'items.*.id' => 'required|exists:tb_products,id',
             'items.*.qty' => 'required|integer|min:1',
             'bayar' => 'required|numeric|min:0',
             'metode_pembayaran' => 'required|in:cash,qris,transfer'
@@ -124,6 +124,7 @@ class PosController extends Controller
                 'bayar' => $request->bayar,
                 'kembali' => $kembali,
                 'metode_pembayaran' => $request->metode_pembayaran,
+                'status_pembayaran' => 'paid',
                 'catatan' => $request->catatan ?? null
             ]);
 

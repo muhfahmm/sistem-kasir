@@ -46,9 +46,27 @@ class CategoryController extends Controller
         ]);
     }
 
+    public function update(Request $request, Category $category)
+    {
+        $request->validate([
+            'nama_kategori' => 'required|string|max:100|unique:tb_categories,nama_kategori,' . $category->id,
+        ]);
+
+        $category->update([
+            'nama_kategori' => $request->nama_kategori,
+            'slug' => Str::slug($request->nama_kategori),
+        ]);
+
+        return redirect()->route('categories.index')->with('success', 'Nama kategori berhasil diperbarui.');
+    }
+
     public function destroy(Category $category)
     {
-        $category->delete();
-        return redirect()->route('categories.index')->with('success', 'Kategori berhasil dihapus.');
+        try {
+            $category->delete();
+            return redirect()->route('categories.index')->with('success', 'Kategori berhasil dihapus.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('categories.index')->with('error', "Kategori '{$category->nama_kategori}' tidak dapat dihapus karena masih terikat dengan produk di toko.");
+        }
     }
 }

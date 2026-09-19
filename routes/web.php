@@ -28,7 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('products', ProductController::class);
 
     // Categories CRUD
-    Route::resource('categories', CategoryController::class)->only(['index', 'store', 'destroy']);
+    Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::post('/categories/quick-store', [CategoryController::class, 'quickStore'])->name('categories.quick-store');
 
     // Terminal Kasir (POS)
@@ -41,3 +41,4 @@ Route::middleware('auth')->group(function () {
     // Riwayat Transaksi
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
 });
+

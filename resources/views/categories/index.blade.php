@@ -46,13 +46,18 @@
                             </span>
                         </td>
                         <td class="py-3.5 px-4 text-center">
-                            <form action="{{ route('categories.destroy', $cat->id) }}" method="POST" onsubmit="return confirm('Hapus kategori ini? Seluruh produk yang terkait juga mungkin akan terpengaruh.')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Hapus Kategori">
-                                    <i class="fa-solid fa-trash-can"></i>
+                            <div class="flex items-center justify-center gap-1">
+                                <button type="button" onclick='openEditCategoryModal(@json($cat))' class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Edit Kategori">
+                                    <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
-                            </form>
+                                <form action="{{ route('categories.destroy', $cat->id) }}" method="POST" onsubmit="return confirm('Hapus kategori ini? Seluruh produk yang terkait juga mungkin akan terpengaruh.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Hapus Kategori">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -96,6 +101,34 @@
         </form>
     </div>
 </div>
+
+<!-- Modal Form Edit Kategori -->
+<div id="editCategoryModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center hidden">
+    <div class="bg-white border border-slate-200 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square text-emerald-600"></i> Edit Kategori
+            </h3>
+            <button onclick="closeEditCategoryModal()" class="text-slate-400 hover:text-slate-700">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <form id="editCategoryForm" method="POST" class="space-y-4">
+            @csrf
+            @method('PUT')
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Nama Kategori <span class="text-rose-500">*</span></label>
+                <input type="text" id="edit_nama_kategori" name="nama_kategori" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:border-emerald-500 focus:bg-white focus:outline-none">
+            </div>
+
+            <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">
+                <button type="button" onclick="closeEditCategoryModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs">Batal</button>
+                <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -106,6 +139,16 @@
 
     function closeCategoryModal() {
         document.getElementById('categoryModal').classList.add('hidden');
+    }
+
+    function openEditCategoryModal(category) {
+        document.getElementById('editCategoryForm').action = '/categories/' + category.id;
+        document.getElementById('edit_nama_kategori').value = category.nama_kategori;
+        document.getElementById('editCategoryModal').classList.remove('hidden');
+    }
+
+    function closeEditCategoryModal() {
+        document.getElementById('editCategoryModal').classList.add('hidden');
     }
 </script>
 @endpush

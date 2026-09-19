@@ -108,10 +108,19 @@
         <!-- Main Body Content -->
         <main class="flex-1 p-6 max-w-7xl w-full mx-auto">
             @if(session('success'))
-                <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between">
+                <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between shadow-sm">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
                         <span class="text-sm font-semibold">{{ session('success') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-600 text-lg"></i>
+                        <span class="text-sm font-semibold">{{ session('error') }}</span>
                     </div>
                 </div>
             @endif
@@ -122,6 +131,7 @@
 
     <!-- HTML5-QRCode Library for Web Cam Scanner -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
 
     <!-- Global Barcode Scanner Listener Script -->
     <script>
