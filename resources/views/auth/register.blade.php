@@ -19,7 +19,7 @@
                 <i class="fa-solid fa-user-plus"></i>
             </div>
             <h1 class="text-2xl font-extrabold text-white tracking-tight">Daftar Akun Baru</h1>
-            <p class="text-slate-400 text-xs mt-1 font-medium">Buat akun Admin atau Kasir untuk mengakses KasirPOS</p>
+            <p class="text-slate-400 text-xs mt-1 font-medium">Buat akun Admin atau Kasir baru untuk mengakses KasirPOS</p>
         </div>
 
         <!-- Alert Error -->
@@ -43,16 +43,16 @@
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nama Lengkap</label>
                     <div class="relative">
-                        <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+                        <i class="fa-solid fa-id-card absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
                         <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Budi Santoso" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white text-xs font-medium placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Alamat Email</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Username</label>
                     <div class="relative">
-                        <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
-                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="nama@toko.com" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white text-xs font-medium placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
+                        <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+                        <input type="text" name="username" value="{{ old('username') }}" required placeholder="Contoh: admin_toko" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white text-xs font-medium placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
                     </div>
                 </div>
 

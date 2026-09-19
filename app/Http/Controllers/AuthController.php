@@ -17,7 +17,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
+            'username' => 'required|string',
             'password' => 'required',
         ]);
 
@@ -27,8 +27,8 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'Email atau password yang Anda masukkan salah.',
-        ])->onlyInput('email');
+            'username' => 'Username atau password yang Anda masukkan salah.',
+        ])->onlyInput('username');
     }
 
     public function showRegister()
@@ -40,14 +40,14 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:tb_users,email',
+            'username' => 'required|string|max:255|unique:tb_users,username',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:admin,kasir',
         ]);
 
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'username' => $request->username,
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);

@@ -13,21 +13,6 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin & Kasir Users
-        User::create([
-            'name' => 'Administrator Toko',
-            'email' => 'admin@pos.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-        ]);
-
-        User::create([
-            'name' => 'Kasir Utama',
-            'email' => 'kasir@pos.com',
-            'password' => Hash::make('password'),
-            'role' => 'kasir',
-        ]);
-
         // Kategori Master (Siap Pakai)
         Category::create(['nama_kategori' => 'Makanan & Snack', 'slug' => 'makanan-snack']);
         Category::create(['nama_kategori' => 'Minuman', 'slug' => 'minuman']);

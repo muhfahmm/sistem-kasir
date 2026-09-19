@@ -20,8 +20,7 @@ DROP TABLE IF EXISTS `tb_users`;
 CREATE TABLE `tb_users` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
-  `email` VARCHAR(255) NOT NULL UNIQUE,
-  `email_verified_at` TIMESTAMP NULL DEFAULT NULL,
+  `username` VARCHAR(255) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `role` ENUM('admin', 'kasir') NOT NULL DEFAULT 'kasir',
   `remember_token` VARCHAR(100) NULL DEFAULT NULL,
@@ -113,12 +112,8 @@ CREATE TABLE `tb_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===================================================
--- DATA AWAL (USERS, KATEGORI, SATUAN, SETTING)
+-- DATA AWAL (KATEGORI, SATUAN, SETTING)
 -- ===================================================
-
-INSERT INTO `tb_users` (`id`, `name`, `email`, `password`, `role`) VALUES
-(1, 'Administrator Toko', 'admin@pos.com', '$2y$12$e/a66y24X5RstWvhLhR8O.K9fS/p.Uo0x4W5S1gBfOqKxS.v3RzS2', 'admin'),
-(2, 'Kasir Utama', 'kasir@pos.com', '$2y$12$e/a66y24X5RstWvhLhR8O.K9fS/p.Uo0x4W5S1gBfOqKxS.v3RzS2', 'kasir');
 
 INSERT INTO `tb_categories` (`id`, `nama_kategori`, `slug`) VALUES
 (1, 'Makanan & Snack', 'makanan-snack'),
