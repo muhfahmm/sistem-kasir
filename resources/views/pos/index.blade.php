@@ -22,7 +22,7 @@
         <!-- Catalog Items -->
         <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm flex-1 overflow-y-auto">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Katalog Produk Cepat</h3>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div id="quick_catalog_grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 @foreach($products as $prod)
                 <div onclick="addToCart({{ json_encode($prod) }})" class="p-3 bg-slate-50 hover:bg-emerald-50/50 border border-slate-200 hover:border-emerald-300 rounded-xl cursor-pointer transition-all flex flex-col justify-between group shadow-sm">
                     <div>
@@ -104,6 +104,84 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Tambah Produk Cepat -->
+<div id="quick_product_modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden transform transition-all">
+        <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-box-open text-emerald-400 text-lg"></i>
+                <h3 class="font-bold text-sm tracking-wide">Produk Tidak Ditemukan</h3>
+            </div>
+            <button onclick="closeQuickProductModal()" class="text-slate-400 hover:text-white transition-colors text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form id="quick_product_form" onsubmit="submitQuickProduct(event)" class="p-6 space-y-4">
+            <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex gap-3 items-center">
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 text-base shrink-0"></i>
+                <div>
+                    <span class="font-bold">Barcode belum terdaftar!</span> Tambahkan detail produk ini untuk menyimpannya ke sistem dan langsung memasukkannya ke keranjang.
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Barcode <span class="text-rose-500">*</span></label>
+                    <input type="text" id="modal_barcode" name="barcode" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono font-bold focus:border-emerald-500 focus:bg-white focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Produk <span class="text-rose-500">*</span></label>
+                    <input type="text" id="modal_nama_produk" name="nama_produk" required placeholder="Contoh: Indomie Goreng 85g" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-medium focus:border-emerald-500 focus:bg-white focus:outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Kategori <span class="text-rose-500">*</span></label>
+                    <select id="modal_category_id" name="category_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-medium focus:border-emerald-500 focus:bg-white focus:outline-none">
+                        @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}">{{ $cat->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Satuan <span class="text-rose-500">*</span></label>
+                    <select id="modal_unit_id" name="unit_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-medium focus:border-emerald-500 focus:bg-white focus:outline-none">
+                        @foreach($units as $u)
+                        <option value="{{ $u->id }}">{{ $u->nama_satuan }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Harga Jual (Rp) <span class="text-rose-500">*</span></label>
+                    <input type="number" id="modal_harga_jual" name="harga_jual" min="0" required placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono font-bold focus:border-emerald-500 focus:bg-white focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Stok Awal <span class="text-rose-500">*</span></label>
+                    <input type="number" id="modal_stok" name="stok" min="1" value="10" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono font-bold focus:border-emerald-500 focus:bg-white focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Stok Min</label>
+                    <input type="number" id="modal_stok_minimal" name="stok_minimal" min="0" value="5" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono focus:border-emerald-500 focus:bg-white focus:outline-none">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button type="button" onclick="closeQuickProductModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-colors">
+                    Batal
+                </button>
+                <button type="submit" id="submit_quick_prod_btn" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Simpan & Masukkan Keranjang
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -114,6 +192,9 @@
     // Auto focus ke input scanner saat halaman dimuat & klik di mana saja
     window.addEventListener('load', () => barcodeInput.focus());
     document.addEventListener('click', (e) => {
+        const modal = document.getElementById('quick_product_modal');
+        if (modal && !modal.classList.contains('hidden')) return;
+
         if (!['INPUT', 'SELECT', 'BUTTON', 'TEXTAREA'].includes(e.target.tagName)) {
             barcodeInput.focus();
         }
@@ -149,12 +230,17 @@
     function fetchProductByBarcode(barcode) {
         fetch(`/pos/barcode/${barcode}`)
             .then(res => {
+                if (res.status === 404) {
+                    openQuickProductModal(barcode);
+                    return null;
+                }
                 if (!res.ok) {
-                    throw new Error('Produk dengan barcode ' + barcode + ' tidak ditemukan!');
+                    throw new Error('Gagal memeriksa barcode ' + barcode);
                 }
                 return res.json();
             })
             .then(data => {
+                if (!data) return;
                 if (data.status === 'success') {
                     addToCart(data.data);
                 } else {
@@ -166,6 +252,90 @@
                 barcodeInput.value = '';
                 barcodeInput.focus();
             });
+    }
+
+    function openQuickProductModal(barcode) {
+        document.getElementById('modal_barcode').value = barcode;
+        document.getElementById('modal_nama_produk').value = '';
+        document.getElementById('modal_harga_jual').value = '';
+        document.getElementById('modal_stok').value = '10';
+        document.getElementById('modal_stok_minimal').value = '5';
+        
+        const modal = document.getElementById('quick_product_modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('modal_nama_produk').focus();
+        }, 100);
+    }
+
+    function closeQuickProductModal() {
+        document.getElementById('quick_product_modal').classList.add('hidden');
+        barcodeInput.value = '';
+        barcodeInput.focus();
+    }
+
+    function submitQuickProduct(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submit_quick_prod_btn');
+        btn.disabled = true;
+        btn.innerText = 'Menyimpan...';
+
+        const payload = {
+            barcode: document.getElementById('modal_barcode').value,
+            nama_produk: document.getElementById('modal_nama_produk').value,
+            category_id: document.getElementById('modal_category_id').value,
+            unit_id: document.getElementById('modal_unit_id').value,
+            harga_jual: document.getElementById('modal_harga_jual').value,
+            stok: document.getElementById('modal_stok').value,
+            stok_minimal: document.getElementById('modal_stok_minimal').value,
+            _token: '{{ csrf_token() }}'
+        };
+
+        fetch('/pos/quick-product', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-plus"></i> Simpan & Masukkan Keranjang';
+
+            if (data.status === 'success') {
+                closeQuickProductModal();
+                addToCart(data.data);
+                appendProductToCatalog(data.data);
+            } else {
+                alert(data.message || 'Gagal menyimpan produk!');
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-plus"></i> Simpan & Masukkan Keranjang';
+            alert('Terjadi kesalahan saat menambahkan produk!');
+        });
+    }
+
+    function appendProductToCatalog(prod) {
+        const grid = document.getElementById('quick_catalog_grid');
+        if (!grid) return;
+        const card = document.createElement('div');
+        card.onclick = () => addToCart(prod);
+        card.className = "p-3 bg-slate-50 hover:bg-emerald-50/50 border border-slate-200 hover:border-emerald-300 rounded-xl cursor-pointer transition-all flex flex-col justify-between group shadow-sm";
+        card.innerHTML = `
+            <div>
+                <span class="text-[10px] font-mono text-slate-400 group-hover:text-emerald-700">${prod.barcode}</span>
+                <h4 class="font-bold text-xs text-slate-800 line-clamp-2 mt-0.5">${prod.nama_produk}</h4>
+            </div>
+            <div class="mt-3 flex items-center justify-between border-t border-slate-200/80 pt-2">
+                <span class="font-extrabold text-xs text-emerald-600">Rp ${Number(prod.harga_jual).toLocaleString('id-ID')}</span>
+                <span class="text-[10px] text-slate-500 font-semibold bg-white px-1.5 py-0.5 rounded border border-slate-200">Stok: ${prod.stok}</span>
+            </div>
+        `;
+        grid.prepend(card);
     }
 
     function addToCart(product) {
@@ -180,9 +350,9 @@
             cart.push({
                 id: product.id,
                 nama_produk: product.nama_produk,
-                harga_jual: product.harga_jual,
+                harga_jual: parseFloat(product.harga_jual),
                 qty: 1,
-                stok: product.stok
+                stok: parseInt(product.stok)
             });
         }
         renderCart();

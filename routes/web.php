@@ -14,6 +14,7 @@ Route::resource('products', ProductController::class);
 // Terminal Kasir (POS)
 Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
 Route::get('/pos/barcode/{barcode}', [PosController::class, 'getProductByBarcode'])->name('pos.barcode');
+Route::post('/pos/quick-product', [PosController::class, 'quickStoreProduct'])->name('pos.quick-product');
 Route::post('/pos/checkout', [PosController::class, 'store'])->name('pos.checkout');
 Route::get('/pos/receipt/{id}', [PosController::class, 'printReceipt'])->name('pos.receipt');
 

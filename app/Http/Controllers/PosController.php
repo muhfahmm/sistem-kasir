@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Unit;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class PosController extends Controller
@@ -15,7 +18,9 @@ class PosController extends Controller
     public function index()
     {
         $products = Product::with(['category', 'unit'])->where('stok', '>', 0)->get();
-        return view('pos.index', compact('products'));
+        $categories = Category::all();
+        $units = Unit::all();
+        return view('pos.index', compact('products', 'categories', 'units'));
     }
 
     public function getProductByBarcode($barcode)
@@ -23,10 +28,48 @@ class PosController extends Controller
         $product = Product::with(['category', 'unit'])->where('barcode', $barcode)->first();
 
         if (!$product) {
-            return response()->json(['status' => 'error', 'message' => 'Produk tidak ditemukan!'], 444);
+            return response()->json(['status' => 'error', 'message' => 'Produk tidak ditemukan!'], 404);
         }
 
         return response()->json(['status' => 'success', 'data' => $product]);
+    }
+
+    public function quickStoreProduct(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama_produk' => 'required|string|max:255',
+            'barcode' => 'required|string|unique:tb_products,barcode',
+            'category_id' => 'required|exists:tb_categories,id',
+            'unit_id' => 'required|exists:tb_units,id',
+            'harga_jual' => 'required|numeric|min:0',
+            'stok' => 'required|integer|min:1',
+            'stok_minimal' => 'nullable|integer|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        $product = Product::create([
+            'nama_produk' => $request->nama_produk,
+            'barcode' => $request->barcode,
+            'category_id' => $request->category_id,
+            'unit_id' => $request->unit_id,
+            'harga_jual' => $request->harga_jual,
+            'stok' => $request->stok,
+            'stok_minimal' => $request->stok_minimal ?? 5,
+        ]);
+
+        $product->load(['category', 'unit']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Produk berhasil ditambahkan!',
+            'data' => $product
+        ]);
     }
 
     public function store(Request $request)
