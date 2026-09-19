@@ -139,7 +139,12 @@
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Kategori <span class="text-rose-500">*</span></label>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-bold text-slate-700">Kategori <span class="text-rose-500">*</span></label>
+                        <button type="button" onclick="openPosQuickCategoryModal()" class="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-plus text-[9px]"></i> Baru
+                        </button>
+                    </div>
                     <select id="modal_category_id" name="category_id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-medium focus:border-emerald-500 focus:bg-white focus:outline-none">
                         @foreach($categories as $cat)
                         <option value="{{ $cat->id }}">{{ $cat->nama_kategori }}</option>
@@ -182,6 +187,30 @@
         </form>
     </div>
 </div>
+<!-- Modal Quick Category POS -->
+<div id="posQuickCategoryModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm overflow-hidden">
+        <div class="bg-slate-900 text-white px-5 py-3 flex justify-between items-center">
+            <h3 class="font-bold text-xs tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-folder-plus text-emerald-400"></i> Tambah Kategori Baru
+            </h3>
+            <button onclick="closePosQuickCategoryModal()" class="text-slate-400 hover:text-white transition-colors text-base">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form onsubmit="submitPosQuickCategory(event)" class="p-5 space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Kategori</label>
+                <input type="text" id="pos_quick_nama_kategori" required placeholder="Contoh: Snack & Permen" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 font-medium focus:border-emerald-500 focus:bg-white focus:outline-none">
+            </div>
+
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button type="button" onclick="closePosQuickCategoryModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs">Batal</button>
+                <button type="submit" id="submit_pos_cat_btn" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20">Simpan Kategori</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -193,12 +222,67 @@
     window.addEventListener('load', () => barcodeInput.focus());
     document.addEventListener('click', (e) => {
         const modal = document.getElementById('quick_product_modal');
-        if (modal && !modal.classList.contains('hidden')) return;
+        const catModal = document.getElementById('posQuickCategoryModal');
+        if ((modal && !modal.classList.contains('hidden')) || (catModal && !catModal.classList.contains('hidden'))) return;
 
         if (!['INPUT', 'SELECT', 'BUTTON', 'TEXTAREA'].includes(e.target.tagName)) {
             barcodeInput.focus();
         }
     });
+
+    // Quick category handlers
+    function openPosQuickCategoryModal() {
+        document.getElementById('pos_quick_nama_kategori').value = '';
+        document.getElementById('posQuickCategoryModal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('pos_quick_nama_kategori').focus(), 100);
+    }
+
+    function closePosQuickCategoryModal() {
+        document.getElementById('posQuickCategoryModal').classList.add('hidden');
+    }
+
+    function submitPosQuickCategory(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submit_pos_cat_btn');
+        const nama = document.getElementById('pos_quick_nama_kategori').value.trim();
+        if (!nama) return;
+
+        btn.disabled = true;
+        btn.innerText = 'Menyimpan...';
+
+        fetch('{{ route("categories.quick-store") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ nama_kategori: nama })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerText = 'Simpan Kategori';
+            if (data.status === 'success') {
+                const select = document.getElementById('modal_category_id');
+                const opt = document.createElement('option');
+                opt.value = data.data.id;
+                opt.text = data.data.nama_kategori;
+                opt.selected = true;
+                select.appendChild(opt);
+
+                closePosQuickCategoryModal();
+                alert('Kategori ' + data.data.nama_kategori + ' berhasil disimpan ke database!');
+            } else {
+                alert(data.message || 'Gagal menyimpan kategori!');
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerText = 'Simpan Kategori';
+            alert('Terjadi kesalahan saat menambahkan kategori.');
+        });
+    }
 
     // Scanner keydown & input listener
     let scanTimeout;
@@ -504,3 +588,4 @@
     }
 </script>
 @endpush
+

@@ -119,7 +119,7 @@ class PosController extends Controller
             // Simpan Transaksi Header
             $transaction = Transaction::create([
                 'no_nota' => 'INV-' . date('YmdHis') . '-' . rand(100, 999),
-                'user_id' => 1, // Default Admin
+                'user_id' => auth()->id() ?? 1,
                 'total_harga' => $totalHarga,
                 'bayar' => $request->bayar,
                 'kembali' => $kembali,

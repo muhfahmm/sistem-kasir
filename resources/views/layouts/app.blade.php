@@ -49,6 +49,11 @@
                     <span>Produk & Stok</span>
                 </a>
 
+                <a href="{{ route('categories.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all {{ request()->routeIs('categories.*') ? 'bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                    <i class="fa-solid fa-tags w-5 text-center text-base {{ request()->routeIs('categories.*') ? 'text-emerald-600' : 'text-slate-400' }}"></i>
+                    <span>Kategori Produk</span>
+                </a>
+
                 <a href="{{ route('transactions.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all {{ request()->routeIs('transactions.*') ? 'bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <i class="fa-solid fa-receipt w-5 text-center text-base {{ request()->routeIs('transactions.*') ? 'text-emerald-600' : 'text-slate-400' }}"></i>
                     <span>Riwayat Transaksi</span>
@@ -58,14 +63,22 @@
 
         <!-- User Profile Card in Sidebar Bottom -->
         <div class="p-4 border-t border-slate-100 bg-slate-50/50">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-sm border border-emerald-200">
-                    A
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 overflow-hidden">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-sm border border-emerald-200 shrink-0">
+                        {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <h4 class="text-xs font-bold text-slate-800 truncate">{{ Auth::user()->name ?? 'Pengguna' }}</h4>
+                        <span class="text-[10px] uppercase font-bold text-emerald-600 block">{{ Auth::user()->role ?? 'Admin' }}</span>
+                    </div>
                 </div>
-                <div class="flex-1 overflow-hidden">
-                    <h4 class="text-xs font-bold text-slate-800 truncate">Administrator Toko</h4>
-                    <span class="text-[11px] text-emerald-600 font-semibold block">Online (Admin)</span>
-                </div>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Keluar (Logout)">
+                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </aside>
@@ -77,10 +90,16 @@
             <div class="flex items-center gap-3">
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Aplikasi Kasir POS</span>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
                 <a href="{{ route('pos.index') }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-2">
                     <i class="fa-solid fa-cart-shopping"></i> Terminal POS
                 </a>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="px-3 py-2 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 font-semibold rounded-xl text-xs border border-slate-200 transition-all flex items-center gap-1.5" title="Logout">
+                        <i class="fa-solid fa-right-from-bracket text-xs"></i> Logout
+                    </button>
+                </form>
             </div>
         </header>
 
