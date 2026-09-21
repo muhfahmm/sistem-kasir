@@ -109,13 +109,7 @@
             @csrf
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Kode Barcode / SKU</label>
-                <div class="flex gap-2">
-                    <input type="text" id="barcode_input" name="barcode" required placeholder="Arahkan scanner fisik atau ketik..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 font-mono text-sm focus:border-emerald-500 focus:bg-white focus:outline-none">
-                    <button type="button" onclick="startCameraScanner()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5">
-                        <i class="fa-solid fa-camera"></i> Scan Cam
-                    </button>
-                </div>
-                <div id="reader" class="mt-3 hidden rounded-xl overflow-hidden border border-slate-200 max-w-sm mx-auto"></div>
+                <input type="text" id="barcode_input" name="barcode" required placeholder="Arahkan scanner fisik atau ketik..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 font-mono text-sm focus:border-emerald-500 focus:bg-white focus:outline-none">
             </div>
 
             <div>
@@ -353,24 +347,6 @@
             btn.innerText = 'Simpan Kategori';
             alert('Terjadi kesalahan saat menambahkan kategori.');
         });
-    }
-
-    let html5QrCode;
-    function startCameraScanner() {
-        const readerDiv = document.getElementById('reader');
-        readerDiv.classList.remove('hidden');
-
-        html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 250, height: 150 } },
-            (decodedText) => {
-                document.getElementById('barcode_input').value = decodedText;
-                html5QrCode.stop();
-                readerDiv.classList.add('hidden');
-            },
-            (errorMessage) => {}
-        ).catch(err => alert("Kamera tidak diizinkan atau tidak ditemukan!"));
     }
 </script>
 @endpush

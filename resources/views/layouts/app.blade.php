@@ -129,9 +129,6 @@
         </main>
     </div>
 
-    <!-- HTML5-QRCode Library for Web Cam Scanner -->
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-
 
     <!-- Global Barcode Scanner Listener Script -->
     <script>

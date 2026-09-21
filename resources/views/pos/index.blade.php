@@ -7,17 +7,12 @@
     <!-- Left Column: Barcode Reader & Product Catalog Grid (7 Cols) -->
     <div class="lg:col-span-7 flex flex-col gap-4">
         <!-- Scan Barcode Bar -->
-        <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm flex gap-3 items-center">
-            <div class="relative flex-1">
+        <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm">
+            <div class="relative w-full">
                 <i class="fa-solid fa-barcode absolute left-3.5 top-3.5 text-emerald-600 text-base"></i>
                 <input type="text" id="barcode_scanner_input" autofocus placeholder="Scan Barcode produk / tekan Enter..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 font-mono text-sm focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all">
             </div>
-            <button onclick="triggerCamera()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-semibold rounded-xl text-xs flex items-center gap-2 transition-all">
-                <i class="fa-solid fa-camera"></i> Scan Cam
-            </button>
         </div>
-
-        <div id="cam_reader" class="hidden bg-white border border-slate-200 p-3 rounded-2xl max-w-sm mx-auto w-full shadow-sm"></div>
 
         <!-- Catalog Items -->
         <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm flex-1 overflow-y-auto">
@@ -578,27 +573,6 @@
             }
         })
         .catch(err => alert("Terjadi kesalahan saat memproses checkout!"));
-    }
-
-    let posQrScanner;
-    function triggerCamera() {
-        const div = document.getElementById('cam_reader');
-        div.classList.toggle('hidden');
-        if (!div.classList.contains('hidden')) {
-            posQrScanner = new Html5Qrcode("cam_reader");
-            posQrScanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 220, height: 140 } },
-                (text) => {
-                    fetchProductByBarcode(text);
-                    posQrScanner.stop();
-                    div.classList.add('hidden');
-                },
-                (err) => {}
-            );
-        } else if (posQrScanner) {
-            posQrScanner.stop();
-        }
     }
 </script>
 @endpush
